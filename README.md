@@ -40,5 +40,3 @@ This repository is actively maintained as a living example of modern Data Scienc
 - Phase 3: Estimation Benchmarks - Comparing Naive vs. Causal models.
 
 This project serves as a demonstration of how Simulation and Causal Inference can solve complex business problems that traditional ML cannot.
-
-This material is designed for educational purposes and professional talks.
