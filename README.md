@@ -1,24 +1,27 @@
-# Beyond Prediction: A Causal Framework for Business Decision Making
+# Beyond Prediction: A Causal Framework using R for solving real world problems
 
 ## Introduction
 
 **Beyond Prediction** is a reference implementation and methodological framework designed to bridge the gap between **predictive modeling** (standard Machine Learning) and **strategic decision-making** (Causal Inference).
 
-In Data Science consulting, we often face business questions such as *"What would happen if...?"* (counterfactuals) that cannot be answered with simple predictions. Moving beyond "black box" algorithms, this repository demonstrates a transparent, rigorous approach based on *in silico* experimental design.
-
-> *"Correlation is not causation, but with the right framework, we can model the difference."*
+In complex business environments and real-world systems, we rarely face simple prediction tasks. Instead, we need to answer fundamental questions about cause and effect, such as:
+* *"Why did this result occur?"* (**Attribution / Root Cause**)
+* *"What causes the outcome to change?"* (**Mechanism**)
+* *"What would happen if we intervened?"* (**Counterfactuals**)
 
 ## The Core Concept
 
-This project provides a blueprint for answering causal questions when A/B testing is not feasible. It combines:
+This project provides a blueprint for answering causal questions when A/B testing is not feasible, ethical, or sufficient. It combines:
 
-1.  **Graph Theory (DAGs):** To explicitly map domain knowledge and assumptions about the business system.
+1.  **Graph Theory (DAGs):** To explicitly map domain knowledge and assumptions about the system's structure.
 2.  **Synthetic Data Generation:** To create a known "Ground Truth" and validate model performance against complex, non-linear scenarios.
-3.  **Causal Estimation:** Techniques to estimate the true effect of an intervention, filtering out spurious correlations (confounding bias).
+3.  **Causal Estimation:** Techniques to disentangle true effects from spurious correlations, allowing us to:
+    * **Diagnose:** Isolate the specific driver of a past event.
+    * **Predict:** Estimate the outcome of a future intervention under uncertainty.
 
 ## Methodology & Tech Stack
 
-This framework applies "Data Engineering" rigor to scientific inquiry, using a polyglot approach for performance and reproducibility:
+This framework employs a robust computational approach, combining high-performance simulation with strict reproducibility standards:
 
 * **Causal Design:** `dagitty` and `ggdag` for defining Directed Acyclic Graphs.
 * **Simulation Engine:** High-performance generation of complex synthetic data (custom distributions, structural equations).
