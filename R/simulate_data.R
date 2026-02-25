@@ -14,7 +14,7 @@ inv_logit <- function(x) {
 
 #' Simulate Delivery Customer Data (Data Generating Process)
 #' 
-#' Generates a synthetic dataset of delivery customers exhibiting Simpson's Paradox.
+#' Generates a synthetic dataset of delivery customers exhibiting Simpson's Paradox. 
 #' The true causal effect of a delivery exception is positive (increases churn), 
 #' but the observational correlation is negative due to the confounding effect 
 #' of shipping volume (driven by user segment).
@@ -59,7 +59,7 @@ simulate_delivery_data <- function(n_customers = 10000, seed = 42) {
   # ----------------------------------------------------------------------------
   # 3. Generate Endogenous Variables (Mechanistic)
   # ----------------------------------------------------------------------------
-  data <- data %>%
+  data <- data |> 
     mutate(
       # V: Shipping Volume (Driven entirely by U)
       shipping_volume = if_else(
@@ -92,7 +92,7 @@ simulate_delivery_data <- function(n_customers = 10000, seed = 42) {
   # ----------------------------------------------------------------------------
   # 4. Final Formatting
   # ----------------------------------------------------------------------------
-  final_data <- data %>%
+  final_data <- data |> 
     select(
       customer_id,
       user_segment = is_power_user,
@@ -101,7 +101,7 @@ simulate_delivery_data <- function(n_customers = 10000, seed = 42) {
       shipping_volume,
       has_exception,
       churned
-    ) %>%
+    ) |> 
     mutate(
       user_segment = if_else(user_segment == 1, "Power User", "Casual User"),
       has_exception = as.integer(has_exception), # 1/0 for easier modeling
