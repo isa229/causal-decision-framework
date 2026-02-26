@@ -1,0 +1,12 @@
+[project]
+name = "causal-decision-framework"
+r_version = "4.5"
+
+repositories = [
+ {alias = "PPM", url = "https://p3m.dev/cran/2026-02-25"}
+]
+
+dependencies = [
+    { name = "dplyr", repository = "PPM" },
+    { name = "tibble", repository = "PPM" },
+]
