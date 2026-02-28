@@ -70,7 +70,7 @@ simulate_delivery_data <- function(n_customers = 10000, seed = 42) {
     )
   
   # ----------------------------------------------------------------------------
-  # 4. Final Formatting (Hide the unobserved variables!)
+  # 4. Final Formatting
   # ----------------------------------------------------------------------------
   final_data <- data |>
     select(
