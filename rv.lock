@@ -4,6 +4,46 @@ version = 2
 r_version = "4.5"
 
 [[packages]]
+name = "DiceDesign"
+version = "1.10"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = []
+
+[[packages]]
+name = "GPfit"
+version = "1.0-9"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    { name = "lhs", requirement = "(>= 0.5)" },
+    { name = "lattice", requirement = "(>= 0.18-8)" },
+]
+
+[[packages]]
+name = "KernSmooth"
+version = "2.23-26"
+source = { builtin = true }
+force_source = false
+dependencies = []
+
+[[packages]]
+name = "MASS"
+version = "7.3-65"
+source = { builtin = true }
+force_source = false
+dependencies = []
+
+[[packages]]
+name = "Matrix"
+version = "1.7-3"
+source = { builtin = true }
+force_source = false
+dependencies = [
+    "lattice",
+]
+
+[[packages]]
 name = "R6"
 version = "2.6.1"
 source = { repository = "https://p3m.dev/cran/2026-02-25" }
@@ -11,8 +51,270 @@ force_source = false
 dependencies = []
 
 [[packages]]
+name = "RColorBrewer"
+version = "1.1-3"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = []
+
+[[packages]]
+name = "Rcpp"
+version = "1.1.1"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = []
+
+[[packages]]
+name = "RcppArmadillo"
+version = "15.2.3-1"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    { name = "Rcpp", requirement = "(>= 1.0.12)" },
+]
+
+[[packages]]
+name = "RcppEigen"
+version = "0.3.4.0.2"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    { name = "Rcpp", requirement = "(>= 0.11.0)" },
+]
+
+[[packages]]
+name = "S7"
+version = "0.2.1"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = []
+
+[[packages]]
+name = "SQUAREM"
+version = "2021.1"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = []
+
+[[packages]]
+name = "V8"
+version = "8.0.1"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    { name = "Rcpp", requirement = "(>= 0.12.12)" },
+    { name = "jsonlite", requirement = "(>= 1.0)" },
+    { name = "curl", requirement = "(>= 1.0)" },
+]
+
+[[packages]]
+name = "backports"
+version = "1.5.0"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = []
+
+[[packages]]
+name = "base64enc"
+version = "0.1-6"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = []
+
+[[packages]]
+name = "boot"
+version = "1.3-31"
+source = { builtin = true }
+force_source = false
+dependencies = []
+
+[[packages]]
+name = "brio"
+version = "1.1.5"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = []
+
+[[packages]]
+name = "broom"
+version = "1.0.12"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    "backports",
+    "cli",
+    { name = "dplyr", requirement = "(>= 1.0.0)" },
+    { name = "generics", requirement = "(>= 0.0.2)" },
+    "glue",
+    "lifecycle",
+    "purrr",
+    { name = "rlang", requirement = "(>= 1.1.0)" },
+    "stringr",
+    { name = "tibble", requirement = "(>= 3.0.0)" },
+    { name = "tidyr", requirement = "(>= 1.0.0)" },
+]
+
+[[packages]]
+name = "cachem"
+version = "1.1.0"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    "rlang",
+    { name = "fastmap", requirement = "(>= 1.2.0)" },
+]
+
+[[packages]]
+name = "callr"
+version = "3.7.6"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    { name = "processx", requirement = "(>= 3.6.1)" },
+    "R6",
+]
+
+[[packages]]
+name = "class"
+version = "7.3-23"
+source = { builtin = true }
+force_source = false
+dependencies = [
+    "MASS",
+]
+
+[[packages]]
 name = "cli"
 version = "3.6.5"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = []
+
+[[packages]]
+name = "clock"
+version = "0.7.4"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    { name = "cli", requirement = "(>= 3.6.4)" },
+    { name = "lifecycle", requirement = "(>= 1.0.4)" },
+    { name = "rlang", requirement = "(>= 1.1.5)" },
+    { name = "tzdb", requirement = "(>= 0.5.0)" },
+    { name = "vctrs", requirement = "(>= 0.6.5)" },
+    { name = "cpp11", requirement = "(>= 0.5.2)" },
+]
+
+[[packages]]
+name = "codetools"
+version = "0.2-20"
+source = { builtin = true }
+force_source = false
+dependencies = []
+
+[[packages]]
+name = "conflicted"
+version = "1.2.0"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    { name = "cli", requirement = "(>= 3.4.0)" },
+    "memoise",
+    { name = "rlang", requirement = "(>= 1.0.0)" },
+]
+
+[[packages]]
+name = "cpp11"
+version = "0.5.3"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = []
+
+[[packages]]
+name = "crayon"
+version = "1.5.3"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = []
+
+[[packages]]
+name = "curl"
+version = "7.0.0"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = []
+
+[[packages]]
+name = "dagitty"
+version = "0.3-4"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    "V8",
+    "jsonlite",
+    "boot",
+    "MASS",
+]
+
+[[packages]]
+name = "data.table"
+version = "1.18.2.1"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = []
+
+[[packages]]
+name = "desc"
+version = "1.4.3"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    "cli",
+    "R6",
+]
+
+[[packages]]
+name = "diagram"
+version = "1.6.5"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    "shape",
+]
+
+[[packages]]
+name = "dials"
+version = "1.4.2"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    { name = "scales", requirement = "(>= 1.3.0)" },
+    "cli",
+    "DiceDesign",
+    { name = "dplyr", requirement = "(>= 0.8.5)" },
+    "glue",
+    { name = "hardhat", requirement = "(>= 1.1.0)" },
+    "lifecycle",
+    "pillar",
+    "purrr",
+    { name = "rlang", requirement = "(>= 1.1.0)" },
+    "sfd",
+    "tibble",
+    { name = "vctrs", requirement = "(>= 0.3.8)" },
+    "withr",
+]
+
+[[packages]]
+name = "diffobj"
+version = "0.3.6"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    { name = "crayon", requirement = "(>= 1.3.2)" },
+]
+
+[[packages]]
+name = "digest"
+version = "0.6.39"
 source = { repository = "https://p3m.dev/cran/2026-02-25" }
 force_source = false
 dependencies = []
@@ -37,6 +339,94 @@ dependencies = [
 ]
 
 [[packages]]
+name = "evaluate"
+version = "1.0.5"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = []
+
+[[packages]]
+name = "farver"
+version = "2.1.2"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = []
+
+[[packages]]
+name = "fastmap"
+version = "1.2.0"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = []
+
+[[packages]]
+name = "forcats"
+version = "1.0.1"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    { name = "cli", requirement = "(>= 3.4.0)" },
+    "glue",
+    "lifecycle",
+    "magrittr",
+    { name = "rlang", requirement = "(>= 1.0.0)" },
+    "tibble",
+]
+
+[[packages]]
+name = "foreach"
+version = "1.5.2"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    "codetools",
+    "iterators",
+]
+
+[[packages]]
+name = "fs"
+version = "1.6.6"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = []
+
+[[packages]]
+name = "furrr"
+version = "0.3.1"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    { name = "future", requirement = "(>= 1.25.0)" },
+    { name = "globals", requirement = "(>= 0.14.0)" },
+    { name = "lifecycle", requirement = "(>= 1.0.1)" },
+    { name = "purrr", requirement = "(>= 0.3.4)" },
+    { name = "rlang", requirement = "(>= 1.0.2)" },
+    { name = "vctrs", requirement = "(>= 0.4.1)" },
+]
+
+[[packages]]
+name = "future"
+version = "1.69.0"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    "digest",
+    { name = "globals", requirement = "(>= 0.18.0)" },
+    { name = "listenv", requirement = "(>= 0.8.0)" },
+    { name = "parallelly", requirement = "(>= 1.44.0)" },
+]
+
+[[packages]]
+name = "future.apply"
+version = "1.20.2"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    { name = "future", requirement = "(>= 1.49.0)" },
+    "globals",
+]
+
+[[packages]]
 name = "generics"
 version = "0.1.4"
 source = { repository = "https://p3m.dev/cran/2026-02-25" }
@@ -44,11 +434,296 @@ force_source = false
 dependencies = []
 
 [[packages]]
+name = "ggdag"
+version = "0.2.13"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    "dagitty",
+    "dplyr",
+    "forcats",
+    { name = "ggplot2", requirement = "(>= 3.0.0)" },
+    { name = "ggraph", requirement = "(>= 2.0.0)" },
+    "ggrepel",
+    "igraph",
+    "magrittr",
+    "pillar",
+    "purrr",
+    "rlang",
+    "stringr",
+    "tibble",
+    "tidygraph",
+]
+
+[[packages]]
+name = "ggforce"
+version = "0.5.0"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    { name = "ggplot2", requirement = "(>= 3.5.0)" },
+    "scales",
+    "MASS",
+    { name = "tweenr", requirement = "(>= 0.1.5)" },
+    "gtable",
+    "rlang",
+    "polyclip",
+    "tidyselect",
+    "withr",
+    "lifecycle",
+    "cli",
+    "vctrs",
+    "systemfonts",
+    "cpp11",
+]
+
+[[packages]]
+name = "ggplot2"
+version = "4.0.2"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    "cli",
+    { name = "gtable", requirement = "(>= 0.3.6)" },
+    "isoband",
+    { name = "lifecycle", requirement = "(> 1.0.1)" },
+    { name = "rlang", requirement = "(>= 1.1.0)" },
+    "S7",
+    { name = "scales", requirement = "(>= 1.4.0)" },
+    { name = "vctrs", requirement = "(>= 0.6.0)" },
+    { name = "withr", requirement = "(>= 2.5.0)" },
+]
+
+[[packages]]
+name = "ggraph"
+version = "2.2.2"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    { name = "ggplot2", requirement = "(>= 3.5.0)" },
+    "dplyr",
+    { name = "ggforce", requirement = "(>= 0.3.1)" },
+    { name = "igraph", requirement = "(>= 1.0.0)" },
+    "scales",
+    "MASS",
+    "ggrepel",
+    "viridis",
+    "rlang",
+    "tidygraph",
+    { name = "graphlayouts", requirement = "(>= 1.1.0)" },
+    "withr",
+    "cli",
+    "vctrs",
+    "lifecycle",
+    "memoise",
+    "cpp11",
+]
+
+[[packages]]
+name = "ggrepel"
+version = "0.9.6"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    { name = "ggplot2", requirement = "(>= 2.2.0)" },
+    "Rcpp",
+    { name = "rlang", requirement = "(>= 0.3.0)" },
+    { name = "scales", requirement = "(>= 0.5.0)" },
+    { name = "withr", requirement = "(>= 2.5.0)" },
+]
+
+[[packages]]
+name = "globals"
+version = "0.19.0"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    "codetools",
+]
+
+[[packages]]
 name = "glue"
 version = "1.8.0"
 source = { repository = "https://p3m.dev/cran/2026-02-25" }
 force_source = false
 dependencies = []
+
+[[packages]]
+name = "gower"
+version = "1.0.2"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = []
+
+[[packages]]
+name = "graphlayouts"
+version = "1.2.3"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    { name = "igraph", requirement = "(>= 2.0.0)" },
+    "Rcpp",
+    "RcppArmadillo",
+]
+
+[[packages]]
+name = "gridExtra"
+version = "2.3"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    "gtable",
+]
+
+[[packages]]
+name = "gtable"
+version = "0.3.6"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    "cli",
+    "glue",
+    "lifecycle",
+    { name = "rlang", requirement = "(>= 1.1.0)" },
+]
+
+[[packages]]
+name = "hardhat"
+version = "1.4.2"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    { name = "cli", requirement = "(>= 3.6.0)" },
+    { name = "glue", requirement = "(>= 1.6.2)" },
+    { name = "rlang", requirement = "(>= 1.1.0)" },
+    { name = "sparsevctrs", requirement = "(>= 0.2.0)" },
+    { name = "tibble", requirement = "(>= 3.2.1)" },
+    { name = "vctrs", requirement = "(>= 0.6.0)" },
+]
+
+[[packages]]
+name = "here"
+version = "1.0.2"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    { name = "rprojroot", requirement = "(>= 2.1.0)" },
+]
+
+[[packages]]
+name = "igraph"
+version = "2.2.2"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    "cli",
+    "lifecycle",
+    "magrittr",
+    "Matrix",
+    { name = "pkgconfig", requirement = "(>= 2.0.0)" },
+    { name = "rlang", requirement = "(>= 1.1.0)" },
+    "vctrs",
+    { name = "cpp11", requirement = "(>= 0.5.0)" },
+]
+
+[[packages]]
+name = "infer"
+version = "1.1.0"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    "broom",
+    "cli",
+    { name = "dplyr", requirement = "(>= 0.7.0)" },
+    "generics",
+    { name = "ggplot2", requirement = "(>= 3.5.2)" },
+    { name = "glue", requirement = "(>= 1.3.0)" },
+    "lifecycle",
+    "magrittr",
+    "patchwork",
+    "purrr",
+    { name = "rlang", requirement = "(>= 0.2.0)" },
+    "tibble",
+    "tidyr",
+    { name = "vctrs", requirement = "(>= 0.6.5)" },
+    "withr",
+]
+
+[[packages]]
+name = "ipred"
+version = "0.9-15"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    { name = "rpart", requirement = "(>= 3.1-8)" },
+    "MASS",
+    "survival",
+    "nnet",
+    "class",
+    "prodlim",
+]
+
+[[packages]]
+name = "isoband"
+version = "0.3.0"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    "cli",
+    "rlang",
+    "cpp11",
+]
+
+[[packages]]
+name = "iterators"
+version = "1.0.14"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = []
+
+[[packages]]
+name = "jsonlite"
+version = "2.0.0"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = []
+
+[[packages]]
+name = "labeling"
+version = "0.4.3"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = []
+
+[[packages]]
+name = "lattice"
+version = "0.22-7"
+source = { builtin = true }
+force_source = false
+dependencies = []
+
+[[packages]]
+name = "lava"
+version = "1.8.2"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    "cli",
+    "future.apply",
+    "numDeriv",
+    "progressr",
+    "survival",
+    "SQUAREM",
+]
+
+[[packages]]
+name = "lhs"
+version = "1.2.0"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    "Rcpp",
+]
 
 [[packages]]
 name = "lifecycle"
@@ -61,11 +736,125 @@ dependencies = [
 ]
 
 [[packages]]
+name = "listenv"
+version = "0.10.0"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = []
+
+[[packages]]
+name = "lubridate"
+version = "1.9.5"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    "generics",
+    { name = "timechange", requirement = "(>= 0.4.0)" },
+]
+
+[[packages]]
 name = "magrittr"
 version = "2.0.4"
 source = { repository = "https://p3m.dev/cran/2026-02-25" }
 force_source = false
 dependencies = []
+
+[[packages]]
+name = "memoise"
+version = "2.0.1"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    { name = "rlang", requirement = "(>= 0.4.10)" },
+    "cachem",
+]
+
+[[packages]]
+name = "modeldata"
+version = "1.5.1"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    "cli",
+    "dplyr",
+    "MASS",
+    "purrr",
+    { name = "rlang", requirement = "(>= 1.1.0)" },
+    "tibble",
+]
+
+[[packages]]
+name = "modelenv"
+version = "0.2.0"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    "cli",
+    "glue",
+    { name = "rlang", requirement = "(>= 1.1.0)" },
+    "tibble",
+    "vctrs",
+]
+
+[[packages]]
+name = "nnet"
+version = "7.3-20"
+source = { builtin = true }
+force_source = false
+dependencies = []
+
+[[packages]]
+name = "numDeriv"
+version = "2016.8-1.1"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = []
+
+[[packages]]
+name = "parallelly"
+version = "1.46.1"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = []
+
+[[packages]]
+name = "parsnip"
+version = "1.4.1"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    "cli",
+    { name = "dplyr", requirement = "(>= 1.1.0)" },
+    { name = "generics", requirement = "(>= 0.1.2)" },
+    "ggplot2",
+    "globals",
+    "glue",
+    { name = "hardhat", requirement = "(>= 1.4.1)" },
+    "lifecycle",
+    "magrittr",
+    "pillar",
+    "prettyunits",
+    { name = "purrr", requirement = "(>= 1.0.0)" },
+    { name = "rlang", requirement = "(>= 1.1.0)" },
+    { name = "sparsevctrs", requirement = "(>= 0.2.0)" },
+    { name = "tibble", requirement = "(>= 2.1.1)" },
+    { name = "tidyr", requirement = "(>= 1.3.0)" },
+    { name = "vctrs", requirement = "(>= 0.6.0)" },
+    "withr",
+]
+
+[[packages]]
+name = "patchwork"
+version = "1.3.2"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    { name = "ggplot2", requirement = "(>= 3.0.0)" },
+    { name = "gtable", requirement = "(>= 0.3.6)" },
+    { name = "rlang", requirement = "(>= 1.0.0)" },
+    "cli",
+    "farver",
+]
 
 [[packages]]
 name = "pillar"
@@ -82,6 +871,19 @@ dependencies = [
 ]
 
 [[packages]]
+name = "pkgbuild"
+version = "1.4.8"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    { name = "callr", requirement = "(>= 3.2.0)" },
+    { name = "cli", requirement = "(>= 3.4.0)" },
+    "desc",
+    "processx",
+    "R6",
+]
+
+[[packages]]
 name = "pkgconfig"
 version = "2.0.3"
 source = { repository = "https://p3m.dev/cran/2026-02-25" }
@@ -89,11 +891,329 @@ force_source = false
 dependencies = []
 
 [[packages]]
+name = "pkgload"
+version = "1.5.0"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    { name = "cli", requirement = "(>= 3.3.0)" },
+    "desc",
+    "fs",
+    "glue",
+    "lifecycle",
+    "pkgbuild",
+    "processx",
+    { name = "rlang", requirement = "(>= 1.1.1)" },
+    "rprojroot",
+]
+
+[[packages]]
+name = "polyclip"
+version = "1.10-7"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = []
+
+[[packages]]
+name = "praise"
+version = "1.0.0"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = []
+
+[[packages]]
+name = "prettyunits"
+version = "1.2.0"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = []
+
+[[packages]]
+name = "processx"
+version = "3.8.6"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    { name = "ps", requirement = "(>= 1.2.0)" },
+    "R6",
+]
+
+[[packages]]
+name = "prodlim"
+version = "2025.04.28"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    { name = "Rcpp", requirement = "(>= 0.11.5)" },
+    "rlang",
+    "data.table",
+    "ggplot2",
+    "diagram",
+    "survival",
+    "KernSmooth",
+    "lava",
+]
+
+[[packages]]
+name = "progressr"
+version = "0.18.0"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    "digest",
+]
+
+[[packages]]
+name = "ps"
+version = "1.9.1"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = []
+
+[[packages]]
+name = "purrr"
+version = "1.2.1"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    { name = "cli", requirement = "(>= 3.6.1)" },
+    { name = "lifecycle", requirement = "(>= 1.0.3)" },
+    { name = "magrittr", requirement = "(>= 1.5.0)" },
+    { name = "rlang", requirement = "(>= 1.1.1)" },
+    { name = "vctrs", requirement = "(>= 0.6.3)" },
+]
+
+[[packages]]
+name = "ranger"
+version = "0.18.0"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    { name = "Rcpp", requirement = "(>= 0.11.2)" },
+    "Matrix",
+    "RcppEigen",
+]
+
+[[packages]]
+name = "recipes"
+version = "1.3.1"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    { name = "dplyr", requirement = "(>= 1.1.0)" },
+    "cli",
+    { name = "clock", requirement = "(>= 0.6.1)" },
+    { name = "generics", requirement = "(>= 0.1.2)" },
+    "glue",
+    "gower",
+    { name = "hardhat", requirement = "(>= 1.4.1)" },
+    { name = "ipred", requirement = "(>= 0.9-12)" },
+    { name = "lifecycle", requirement = "(>= 1.0.3)" },
+    { name = "lubridate", requirement = "(>= 1.8.0)" },
+    "magrittr",
+    "Matrix",
+    { name = "purrr", requirement = "(>= 1.0.0)" },
+    { name = "rlang", requirement = "(>= 1.1.0)" },
+    { name = "sparsevctrs", requirement = "(>= 0.3.3)" },
+    "tibble",
+    { name = "tidyr", requirement = "(>= 1.0.0)" },
+    { name = "tidyselect", requirement = "(>= 1.2.0)" },
+    "timeDate",
+    { name = "vctrs", requirement = "(>= 0.5.0)" },
+    "withr",
+]
+
+[[packages]]
 name = "rlang"
 version = "1.1.7"
 source = { repository = "https://p3m.dev/cran/2026-02-25" }
 force_source = false
 dependencies = []
+
+[[packages]]
+name = "rpart"
+version = "4.1.24"
+source = { builtin = true }
+force_source = false
+dependencies = []
+
+[[packages]]
+name = "rprojroot"
+version = "2.1.1"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = []
+
+[[packages]]
+name = "rsample"
+version = "1.3.2"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    "cli",
+    { name = "dplyr", requirement = "(>= 1.1.1)" },
+    "furrr",
+    "generics",
+    "glue",
+    "lifecycle",
+    "pillar",
+    { name = "purrr", requirement = "(>= 1.0.0)" },
+    { name = "rlang", requirement = "(>= 1.1.0)" },
+    { name = "slider", requirement = "(>= 0.1.5)" },
+    "tibble",
+    "tidyr",
+    "tidyselect",
+    { name = "vctrs", requirement = "(>= 0.5.0)" },
+]
+
+[[packages]]
+name = "rstudioapi"
+version = "0.18.0"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = []
+
+[[packages]]
+name = "scales"
+version = "1.4.0"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    "cli",
+    { name = "farver", requirement = "(>= 2.0.3)" },
+    "glue",
+    "labeling",
+    "lifecycle",
+    "R6",
+    "RColorBrewer",
+    { name = "rlang", requirement = "(>= 1.1.0)" },
+    "viridisLite",
+]
+
+[[packages]]
+name = "sfd"
+version = "0.1.0"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    "tibble",
+    "cli",
+    "rlang",
+]
+
+[[packages]]
+name = "shape"
+version = "1.4.6.1"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = []
+
+[[packages]]
+name = "slider"
+version = "0.3.3"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    { name = "cli", requirement = "(>= 3.6.1)" },
+    { name = "rlang", requirement = "(>= 1.1.1)" },
+    { name = "vctrs", requirement = "(>= 0.6.3)" },
+    "warp",
+]
+
+[[packages]]
+name = "sparsevctrs"
+version = "0.3.6"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    { name = "cli", requirement = "(>= 3.4.0)" },
+    { name = "rlang", requirement = "(>= 1.1.0)" },
+    "vctrs",
+]
+
+[[packages]]
+name = "stringi"
+version = "1.8.7"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = []
+
+[[packages]]
+name = "stringr"
+version = "1.6.0"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    "cli",
+    { name = "glue", requirement = "(>= 1.6.1)" },
+    { name = "lifecycle", requirement = "(>= 1.0.3)" },
+    "magrittr",
+    { name = "rlang", requirement = "(>= 1.0.0)" },
+    { name = "stringi", requirement = "(>= 1.5.3)" },
+    { name = "vctrs", requirement = "(>= 0.4.0)" },
+]
+
+[[packages]]
+name = "survival"
+version = "3.8-3"
+source = { builtin = true }
+force_source = false
+dependencies = [
+    "Matrix",
+]
+
+[[packages]]
+name = "systemfonts"
+version = "1.3.1"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    "base64enc",
+    "jsonlite",
+    "lifecycle",
+    { name = "cpp11", requirement = "(>= 0.2.1)" },
+]
+
+[[packages]]
+name = "tailor"
+version = "0.1.0"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    "cli",
+    "dplyr",
+    "generics",
+    "hardhat",
+    "purrr",
+    { name = "rlang", requirement = "(>= 1.1.0)" },
+    "tibble",
+    "tidyselect",
+    "vctrs",
+]
+
+[[packages]]
+name = "testthat"
+version = "3.3.2"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    { name = "brio", requirement = "(>= 1.1.5)" },
+    { name = "callr", requirement = "(>= 3.7.6)" },
+    { name = "cli", requirement = "(>= 3.6.5)" },
+    { name = "desc", requirement = "(>= 1.4.3)" },
+    { name = "evaluate", requirement = "(>= 1.0.4)" },
+    { name = "jsonlite", requirement = "(>= 2.0.0)" },
+    { name = "lifecycle", requirement = "(>= 1.0.4)" },
+    { name = "magrittr", requirement = "(>= 2.0.3)" },
+    { name = "pkgload", requirement = "(>= 1.4.0)" },
+    { name = "praise", requirement = "(>= 1.0.0)" },
+    { name = "processx", requirement = "(>= 3.8.6)" },
+    { name = "ps", requirement = "(>= 1.9.1)" },
+    { name = "R6", requirement = "(>= 2.6.1)" },
+    { name = "rlang", requirement = "(>= 1.1.6)" },
+    { name = "waldo", requirement = "(>= 0.6.2)" },
+    { name = "withr", requirement = "(>= 3.0.2)" },
+]
 
 [[packages]]
 name = "tibble"
@@ -111,6 +1231,74 @@ dependencies = [
 ]
 
 [[packages]]
+name = "tidygraph"
+version = "1.3.1"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    "cli",
+    { name = "dplyr", requirement = "(>= 0.8.5)" },
+    { name = "igraph", requirement = "(>= 2.0.0)" },
+    "lifecycle",
+    "magrittr",
+    "pillar",
+    "R6",
+    "rlang",
+    "tibble",
+    "tidyr",
+    "cpp11",
+]
+
+[[packages]]
+name = "tidymodels"
+version = "1.4.1"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    { name = "broom", requirement = "(>= 1.0.9)" },
+    { name = "cli", requirement = "(>= 3.6.5)" },
+    { name = "conflicted", requirement = "(>= 1.2.0)" },
+    { name = "dials", requirement = "(>= 1.4.2)" },
+    { name = "dplyr", requirement = "(>= 1.1.4)" },
+    { name = "ggplot2", requirement = "(>= 3.5.2)" },
+    { name = "hardhat", requirement = "(>= 1.4.2)" },
+    { name = "infer", requirement = "(>= 1.0.9)" },
+    { name = "modeldata", requirement = "(>= 1.5.1)" },
+    { name = "parsnip", requirement = "(>= 1.3.3)" },
+    { name = "purrr", requirement = "(>= 1.1.0)" },
+    { name = "recipes", requirement = "(>= 1.3.1)" },
+    { name = "rlang", requirement = "(>= 1.1.6)" },
+    { name = "rsample", requirement = "(>= 1.3.1)" },
+    { name = "rstudioapi", requirement = "(>= 0.17.1)" },
+    { name = "tailor", requirement = "(>= 0.1.0)" },
+    { name = "tidyr", requirement = "(>= 1.3.1)" },
+    { name = "tune", requirement = "(>= 2.0.0)" },
+    { name = "workflows", requirement = "(>= 1.3.0)" },
+    { name = "workflowsets", requirement = "(>= 1.1.1)" },
+    { name = "yardstick", requirement = "(>= 1.3.2)" },
+]
+
+[[packages]]
+name = "tidyr"
+version = "1.3.2"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    { name = "cli", requirement = "(>= 3.4.1)" },
+    { name = "dplyr", requirement = "(>= 1.1.0)" },
+    "glue",
+    { name = "lifecycle", requirement = "(>= 1.0.3)" },
+    "magrittr",
+    { name = "purrr", requirement = "(>= 1.0.1)" },
+    { name = "rlang", requirement = "(>= 1.1.1)" },
+    { name = "stringr", requirement = "(>= 1.5.0)" },
+    { name = "tibble", requirement = "(>= 2.1.1)" },
+    { name = "tidyselect", requirement = "(>= 1.2.1)" },
+    { name = "vctrs", requirement = "(>= 0.5.2)" },
+    { name = "cpp11", requirement = "(>= 0.4.0)" },
+]
+
+[[packages]]
 name = "tidyselect"
 version = "1.2.1"
 source = { repository = "https://p3m.dev/cran/2026-02-25" }
@@ -122,6 +1310,73 @@ dependencies = [
     { name = "rlang", requirement = "(>= 1.0.4)" },
     { name = "vctrs", requirement = "(>= 0.5.2)" },
     "withr",
+]
+
+[[packages]]
+name = "timeDate"
+version = "4052.112"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = []
+
+[[packages]]
+name = "timechange"
+version = "0.4.0"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    { name = "cpp11", requirement = "(>= 0.2.7)" },
+]
+
+[[packages]]
+name = "tune"
+version = "2.0.1"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    { name = "cli", requirement = "(>= 3.3.0)" },
+    { name = "dials", requirement = "(>= 1.3.0.9000)" },
+    { name = "dplyr", requirement = "(>= 1.1.0)" },
+    { name = "generics", requirement = "(>= 0.1.2)" },
+    "ggplot2",
+    { name = "glue", requirement = "(>= 1.6.2)" },
+    "GPfit",
+    { name = "hardhat", requirement = "(>= 1.4.2)" },
+    { name = "parsnip", requirement = "(>= 1.2.1.9003)" },
+    { name = "purrr", requirement = "(>= 1.0.0)" },
+    { name = "recipes", requirement = "(>= 1.1.0.9001)" },
+    { name = "rlang", requirement = "(>= 1.1.4)" },
+    { name = "rsample", requirement = "(>= 1.3.0.9003)" },
+    { name = "tailor", requirement = "(>= 0.1.0)" },
+    { name = "tibble", requirement = "(>= 3.1.0)" },
+    { name = "tidyr", requirement = "(>= 1.2.0)" },
+    { name = "tidyselect", requirement = "(>= 1.1.2)" },
+    { name = "vctrs", requirement = "(>= 0.6.1)" },
+    "withr",
+    { name = "workflows", requirement = "(>= 1.3.0)" },
+    { name = "yardstick", requirement = "(>= 1.3.0)" },
+]
+
+[[packages]]
+name = "tweenr"
+version = "2.0.3"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    "farver",
+    "magrittr",
+    "rlang",
+    "vctrs",
+    { name = "cpp11", requirement = "(>= 0.4.2)" },
+]
+
+[[packages]]
+name = "tzdb"
+version = "0.5.0"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    { name = "cpp11", requirement = "(>= 0.5.2)" },
 ]
 
 [[packages]]
@@ -144,8 +1399,133 @@ dependencies = [
 ]
 
 [[packages]]
+name = "vip"
+version = "0.4.5"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    "foreach",
+    { name = "ggplot2", requirement = "(>= 0.9.0)" },
+    "tibble",
+    "yardstick",
+]
+
+[[packages]]
+name = "viridis"
+version = "0.6.5"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    { name = "viridisLite", requirement = "(>= 0.4.0)" },
+    { name = "ggplot2", requirement = "(>= 1.0.1)" },
+    "gridExtra",
+]
+
+[[packages]]
+name = "viridisLite"
+version = "0.4.3"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = []
+
+[[packages]]
+name = "waldo"
+version = "0.6.2"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    "cli",
+    { name = "diffobj", requirement = "(>= 0.3.4)" },
+    "glue",
+    { name = "rlang", requirement = "(>= 1.1.0)" },
+]
+
+[[packages]]
+name = "warp"
+version = "0.2.3"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = []
+
+[[packages]]
 name = "withr"
 version = "3.0.2"
 source = { repository = "https://p3m.dev/cran/2026-02-25" }
 force_source = false
 dependencies = []
+
+[[packages]]
+name = "workflows"
+version = "1.3.0"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    { name = "cli", requirement = "(>= 3.3.0)" },
+    { name = "generics", requirement = "(>= 0.1.2)" },
+    { name = "glue", requirement = "(>= 1.6.2)" },
+    { name = "hardhat", requirement = "(>= 1.4.2)" },
+    { name = "lifecycle", requirement = "(>= 1.0.3)" },
+    { name = "modelenv", requirement = "(>= 0.1.0)" },
+    { name = "parsnip", requirement = "(>= 1.2.1.9000)" },
+    { name = "recipes", requirement = "(>= 1.0.10.9000)" },
+    { name = "rlang", requirement = "(>= 1.1.0)" },
+    { name = "sparsevctrs", requirement = "(>= 0.1.0.9003)" },
+    { name = "tidyselect", requirement = "(>= 1.2.0)" },
+    { name = "vctrs", requirement = "(>= 0.4.1)" },
+    "withr",
+]
+
+[[packages]]
+name = "workflowsets"
+version = "1.1.1"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    "cli",
+    { name = "dplyr", requirement = "(>= 1.0.0)" },
+    { name = "generics", requirement = "(>= 0.1.2)" },
+    "ggplot2",
+    { name = "hardhat", requirement = "(>= 1.2.0)" },
+    { name = "lifecycle", requirement = "(>= 1.0.0)" },
+    { name = "parsnip", requirement = "(>= 1.2.1)" },
+    { name = "pillar", requirement = "(>= 1.7.0)" },
+    "prettyunits",
+    "purrr",
+    { name = "rlang", requirement = "(>= 1.1.0)" },
+    { name = "rsample", requirement = "(>= 0.0.9)" },
+    { name = "tibble", requirement = "(>= 3.1.0)" },
+    "tidyr",
+    { name = "tune", requirement = "(>= 1.2.0)" },
+    "vctrs",
+    "withr",
+    { name = "workflows", requirement = "(>= 1.1.4)" },
+]
+
+[[packages]]
+name = "xgboost"
+version = "3.2.0.1"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    { name = "Matrix", requirement = "(>= 1.1-0)" },
+    { name = "data.table", requirement = "(>= 1.9.6)" },
+    { name = "jsonlite", requirement = "(>= 1.0)" },
+]
+
+[[packages]]
+name = "yardstick"
+version = "1.3.2"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    "cli",
+    { name = "dplyr", requirement = "(>= 1.1.0)" },
+    { name = "generics", requirement = "(>= 0.1.2)" },
+    { name = "hardhat", requirement = "(>= 1.3.0)" },
+    { name = "lifecycle", requirement = "(>= 1.0.3)" },
+    { name = "rlang", requirement = "(>= 1.1.4)" },
+    "tibble",
+    { name = "tidyselect", requirement = "(>= 1.2.0)" },
+    { name = "vctrs", requirement = "(>= 0.5.0)" },
+    "withr",
+]

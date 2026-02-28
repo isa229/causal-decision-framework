@@ -1,84 +1,66 @@
 library(testthat)
 library(dplyr)
-library(tidyr) # Added for potential future use, though filter/pull is sufficient here
+library(broom)
 
 source("R/02_simulate_data.R")
 
-test_that("The DGP correctly generates Simpson's Paradox", {
+test_that("The DGP correctly generates Collider Bias (The Support Ticket Trap)", {
   
-  # Generate a large dataset with a fixed seed for statistical stability
-  df <- simulate_delivery_data(n_customers = 20000, seed = 2026)
+  # 1. Generate a large dataset to ensure stable coefficients
+  df <- simulate_delivery_data(n_customers = 50000, seed = 2026)
   
+  # Convert churned to numeric (0 and 1) for the logistic regression models
   df <- df |>
     mutate(churn_numeric = as.numeric(as.character(churned)))
   
   # ----------------------------------------------------------------------------
-  # Calculate Aggregate Rates (The Observational Illusion)
+  # Model 1: The Causal Truth (Dropping the Collider)
   # ----------------------------------------------------------------------------
-  agg_rates <- df |>
-    group_by(has_exception) |>
-    summarise(churn_rate = mean(churn_numeric), .groups = "drop")
+  # We regress churn on the exception, intentionally ignoring the support ticket.
+  causal_model <- glm(churn_numeric ~ has_exception, data = df, family = binomial())
   
-  rate_no_exc_agg <- agg_rates |> 
-    filter(has_exception == 0) |> 
-    pull(churn_rate)
-    
-  rate_yes_exc_agg <- agg_rates |> 
-    filter(has_exception == 1) |> 
-    pull(churn_rate)
+  # Extract the coefficient for has_exception
+  true_effect <- tidy(causal_model) |>
+    filter(term == "has_exception") |>
+    pull(estimate)
   
   # ----------------------------------------------------------------------------
-  # Calculate Stratified Rates (The Causal Reality)
+  # Model 2: The ML Trap (Conditioning on the Collider)
   # ----------------------------------------------------------------------------
-  stratified_rates <- df |>
-    group_by(user_segment, has_exception) |>
-    summarise(churn_rate = mean(churn_numeric), .groups = "drop")
+  # We include the 'opened_support_ticket' variable, which opens the backdoor path.
+  ml_model <- glm(churn_numeric ~ has_exception + opened_support_ticket, data = df, family = binomial())
   
-  rate_no_exc_power <- stratified_rates |> 
-    filter(user_segment == "Power User", has_exception == 0) |> 
-    pull(churn_rate)
-    
-  rate_yes_exc_power <- stratified_rates |> 
-    filter(user_segment == "Power User", has_exception == 1) |> 
-    pull(churn_rate)
-  
-  rate_no_exc_casual <- stratified_rates |> 
-    filter(user_segment == "Casual User", has_exception == 0) |> 
-    pull(churn_rate)
-    
-  rate_yes_exc_casual <- stratified_rates |> 
-    filter(user_segment == "Casual User", has_exception == 1) |> 
-    pull(churn_rate)
+  # Extract the coefficient for has_exception
+  biased_effect <- tidy(ml_model) |>
+    filter(term == "has_exception") |>
+    pull(estimate)
   
   # ----------------------------------------------------------------------------
   # ASSERTIONS
   # ----------------------------------------------------------------------------
   
-  # Test 1: At the aggregate level, exceptions appear to REDUCE churn (Spurious Correlation)
-  expect_lt(
-    rate_yes_exc_agg, 
-    rate_no_exc_agg, 
-    label = "Aggregate churn rate with exception must be lower than without exception (The Illusion)"
-  )
-  
-  # Test 2: For Power Users, exceptions INCREASE churn (True Causal Effect)
+  # Test 1: The true causal effect must be positive (Exceptions CAUSE churn)
   expect_gt(
-    rate_yes_exc_power, 
-    rate_no_exc_power,
-    label = "Exception must increase churn for Power Users (True Causal Effect)"
+    true_effect, 
+    0, 
+    label = "When omitting the collider, the effect of exceptions on churn must be correctly positive."
   )
   
-  # Test 3: For Casual Users, exceptions INCREASE churn (True Causal Effect)
-  expect_gt(
-    rate_yes_exc_casual, 
-    rate_no_exc_casual,
-    label = "Exception must increase churn for Casual Users (True Causal Effect)"
-  )
-  
-  # Test 4: Sanity check (Power Users have a much lower baseline churn than Casual Users)
+  # Test 2: The biased effect must be negative (The Spurious Correlation)
   expect_lt(
-    rate_no_exc_power,
-    rate_no_exc_casual,
-    label = "Power users must have lower baseline churn due to lock-in"
+    biased_effect, 
+    0, 
+    label = "When conditioning on the collider, the effect of exceptions must incorrectly appear negative."
+  )
+  
+  # Test 3: The Support Ticket must be highly predictive of churn overall (Why ML loves it)
+  ticket_effect <- tidy(ml_model) |>
+    filter(term == "opened_support_ticket") |>
+    pull(estimate)
+  
+  expect_gt(
+    ticket_effect,
+    1.0,
+    label = "Support tickets must strongly predict churn, explaining why ML algorithms select it as a top feature."
   )
 })

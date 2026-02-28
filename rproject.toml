@@ -9,4 +9,15 @@ repositories = [
 dependencies = [
     { name = "dplyr", repository = "PPM" },
     { name = "tibble", repository = "PPM" },
+    { name = "tidymodels", repository = "PPM" },
+    { name = "testthat", repository = "PPM" },
+    { name = "tidyr", repository = "PPM" },
+    { name = "vip", repository = "PPM" },
+    { name = "ggplot2", repository = "PPM" },
+    { name = "broom", repository = "PPM" },
+    { name = "ranger", repository = "PPM" },
+    { name = "xgboost", repository = "PPM" },
+    { name = "here", repository = "PPM" },
+    { name = "dagitty", repository = "PPM" },
+    { name = "ggdag", repository = "PPM" },
 ]
