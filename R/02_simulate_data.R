@@ -58,8 +58,8 @@ simulate_delivery_data <- function(n_customers = 10000, seed = 42) {
   # ----------------------------------------------------------------------------
   data <- data |>
     mutate(
-      # The TRUE direct effect of exception is moderate (0.4).
-      # The effect of impatience is MASSIVE (4.0).
+      # The TRUE direct effect of exception is moderate
+      # The effect of impatience is massive
       log_odds_churn = -2.0 + 
                        (0.4 * has_exception) + 
                        (4.0 * impatience_score) + 
