@@ -18,4 +18,6 @@ dependencies = [
     { name = "ranger", repository = "PPM" },
     { name = "xgboost", repository = "PPM" },
     { name = "here", repository = "PPM" },
+    { name = "dagitty", repository = "PPM" },
+    { name = "ggdag", repository = "PPM" },
 ]
