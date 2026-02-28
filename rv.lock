@@ -65,6 +65,15 @@ force_source = false
 dependencies = []
 
 [[packages]]
+name = "RcppEigen"
+version = "0.3.4.0.2"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    { name = "Rcpp", requirement = "(>= 0.11.0)" },
+]
+
+[[packages]]
 name = "S7"
 version = "0.2.1"
 source = { repository = "https://p3m.dev/cran/2026-02-25" }
@@ -424,6 +433,15 @@ dependencies = [
 ]
 
 [[packages]]
+name = "here"
+version = "1.0.2"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    { name = "rprojroot", requirement = "(>= 2.1.0)" },
+]
+
+[[packages]]
 name = "infer"
 version = "1.1.0"
 source = { repository = "https://p3m.dev/cran/2026-02-25" }
@@ -771,6 +789,17 @@ dependencies = [
     { name = "magrittr", requirement = "(>= 1.5.0)" },
     { name = "rlang", requirement = "(>= 1.1.1)" },
     { name = "vctrs", requirement = "(>= 0.6.3)" },
+]
+
+[[packages]]
+name = "ranger"
+version = "0.18.0"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    { name = "Rcpp", requirement = "(>= 0.11.2)" },
+    "Matrix",
+    "RcppEigen",
 ]
 
 [[packages]]
@@ -1223,6 +1252,17 @@ dependencies = [
     "vctrs",
     "withr",
     { name = "workflows", requirement = "(>= 1.1.4)" },
+]
+
+[[packages]]
+name = "xgboost"
+version = "3.2.0.1"
+source = { repository = "https://p3m.dev/cran/2026-02-25" }
+force_source = false
+dependencies = [
+    { name = "Matrix", requirement = "(>= 1.1-0)" },
+    { name = "data.table", requirement = "(>= 1.9.6)" },
+    { name = "jsonlite", requirement = "(>= 1.0)" },
 ]
 
 [[packages]]

@@ -15,4 +15,7 @@ dependencies = [
     { name = "vip", repository = "PPM" },
     { name = "ggplot2", repository = "PPM" },
     { name = "broom", repository = "PPM" },
+    { name = "ranger", repository = "PPM" },
+    { name = "xgboost", repository = "PPM" },
+    { name = "here", repository = "PPM" },
 ]
