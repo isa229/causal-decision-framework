@@ -43,8 +43,7 @@ define_causal_dag <- function() {
 #' 
 #' @param dag_obj The dagitty object from define_causal_dag()
 get_adjustment_strategy <- function(dag_obj) {
-  
-  # dagitty calculates the exact set of variables needed to block backdoor paths
+
   adjustment_sets <- adjustmentSets(dag_obj, exposure = "Exception", outcome = "Churn")
   
   return(adjustment_sets)
