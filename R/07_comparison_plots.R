@@ -65,3 +65,43 @@ plot_ground_truth_comparison <- function(comparison_table) {
   
   return(p)
 }
+
+
+
+#' Plot Bias Comparison
+#'
+#' Shows the magnitude of bias for each method
+#' 
+#' @param comparison_table Output from compare_to_ground_truth()
+#' @return A ggplot object
+plot_bias_comparison <- function(comparison_table) {
+  
+  plot_data <- comparison_table |>
+    filter(Method != "Ground Truth (DGP)") |>
+    mutate(
+      Method = gsub(" \\(.*\\)", "", Method),
+      Abs_Pct_Bias = abs(Pct_Bias),
+      Label = paste0(round(Pct_Bias, 1), "%")
+    )
+  
+  p <- ggplot(plot_data, aes(x = reorder(Method, -Abs_Pct_Bias), y = Pct_Bias)) +
+    geom_col(aes(fill = Abs_Pct_Bias > 50), width = 0.6, alpha = 0.9) +
+    geom_text(aes(label = Label), vjust = -0.5, fontface = "bold", size = 4) +
+    scale_fill_manual(
+      values = c("TRUE" = "#C62828", "FALSE" = "#1565C0"),
+      guide = "none"
+    ) +
+    labs(
+      title = "Percent Bias Relative to Ground Truth",
+      subtitle = "Naive model has massive bias; DAG-guided model is nearly unbiased",
+      x = NULL,
+      y = "Percent Bias (%)"
+    ) +
+    theme_minimal(base_size = 13) +
+    theme(
+      plot.title = element_text(face = "bold"),
+      panel.grid.major.x = element_blank()
+    )
+  
+  return(p)
+}
