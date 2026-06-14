@@ -101,3 +101,15 @@ ggsave(
   width = 10, height = 7, dpi = 300, bg = "white"
 )
 cat("Ground truth comparison saved\n")
+
+
+# ------------------------------------------------------------------------------
+# 7. Generate Coefficient Trajectory Plot
+# ------------------------------------------------------------------------------
+cat("Step 6/7: Creating coefficient trajectory analysis...\n")
+ggsave(
+  filename = here::here("figures", "07_coefficient_trajectory.png"),
+  plot = plot_coefficient_trajectory(df),
+  width = 10, height = 6, dpi = 300, bg = "white"
+)
+cat("Coefficient trajectory saved\n\n")
