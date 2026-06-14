@@ -88,9 +88,9 @@ compare_to_ground_truth <- function(naive_workflows, causal_workflows) {
     Pct_Bias = c(0, 
                  (naive_coef$estimate - truth$log_odds) / truth$log_odds * 100,
                  (causal_coef$estimate - truth$log_odds) / truth$log_odds * 100),
-    Direction = c("Positive (↑ Churn)", 
-                  ifelse(naive_coef$estimate > 0, "Positive (↑ Churn)", "NEGATIVE (↓ Churn) ⚠️"),
-                  ifelse(causal_coef$estimate > 0, "Positive (↑ Churn)", "Negative (↓ Churn)"))
+    Direction = c("Positive (Increases Churn)", 
+                  ifelse(naive_coef$estimate > 0, "Positive (Increases Churn)", "NEGATIVE (Decreases Churn) WARNING"),
+                  ifelse(causal_coef$estimate > 0, "Positive (Increases Churn)", "Negative (Decreases Churn)"))
   )
   
   return(comparison)
