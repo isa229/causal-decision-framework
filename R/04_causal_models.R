@@ -21,12 +21,19 @@ fit_causal_models <- function(data) {
   train_data <- training(data_split)
   test_data  <- testing(data_split)
   
-  # 2. Recipe: The Causal Intervention
+  # 2. Recipe: The Causal Intervention (DAG-Guided)
   causal_recipe <- recipe(churned ~ ., data = train_data) |>
     update_role(customer_id, new_role = "ID") |>
-    # --- THE DAG INTERVENTION ---
-    # We explicitly remove the collider
-    step_rm(opened_support_ticket) |> 
+    # The DAG intervention
+    # Remove the collider (opened_support_ticket)
+    # Remove noise variables (age, emails, logins)
+    # Keep only causally relevant variables per adjustment set:
+    #    has_exception (treatment)
+    #    impatience_score (confounder, must adjust)
+    #    account_tenure_months (precision covariate)
+    #    monthly_spend_usd (precision covariate)
+    step_rm(opened_support_ticket, customer_age_years, 
+            marketing_emails_clicked, app_logins_last_7_days) |> 
     # ----------------------------
     step_dummy(all_nominal_predictors()) |>
     step_normalize(all_numeric_predictors())
