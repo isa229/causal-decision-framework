@@ -113,3 +113,39 @@ ggsave(
   width = 10, height = 6, dpi = 300, bg = "white"
 )
 cat("Coefficient trajectory saved\n\n")
+
+
+# ------------------------------------------------------------------------------
+# 8. Bootstrap Confidence Intervals
+# ------------------------------------------------------------------------------
+cat("Step 7/7: Computing bootstrap confidence intervals...\n")
+boot_ci <- bootstrap_ate_ci(df, n_bootstrap = 1000, seed = 2026)
+cat("\n")
+cat("BOOTSTRAP 95% CI:\n")
+cat(strrep("-", 80), "\n")
+print(boot_ci)
+cat(strrep("-", 80), "\n\n")
+
+# ------------------------------------------------------------------------------
+# Summary
+# ------------------------------------------------------------------------------
+cat("\n")
+cat(strrep("=", 80), "\n")
+cat("Complete! All figures generated successfully.\n")
+cat(strrep("=", 80), "\n")
+cat("\n")
+cat("Key Results:\n")
+cat("- Ground truth effect:  0.500 log-odds\n")
+cat("- Naive model estimate: ", sprintf("%.3f", comparison$Estimate[2]), " log-odds (Wrong direction)\n")
+cat("- Causal model estimate:", sprintf("%.3f", comparison$Estimate[3]), " log-odds (Recovers truth)\n")
+cat("- Bias reduction:       ", sprintf("%.1f", abs(comparison$Pct_Bias[2]) - abs(comparison$Pct_Bias[3])), "%%\n")
+cat("\n")
+cat("Generated figures:\n")
+cat("  1. 01_causal_dag.png: The assumptions (DAG)\n")
+cat("  2. 02_naive_glm_trap.png: Wrong coefficient sign\n")
+cat("  3. 03_naive_xgb_vip.png: ML reliance on collider\n")
+cat("  4. 04_causal_glm_solution.png: Correct coefficient sign\n")
+cat("  5. 05_causal_xgb_vip.png: DAG-guided features\n")
+cat("  6. 06_ground_truth_comparison.png: )\n")
+cat("  7. 07_coefficient_trajectory.png: Specification sensitivity\n")
+
