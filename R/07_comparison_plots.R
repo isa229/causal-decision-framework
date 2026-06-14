@@ -105,3 +105,45 @@ plot_bias_comparison <- function(comparison_table) {
   
   return(p)
 }
+
+
+#' Create Comprehensive Validation Dashboard
+#'
+#' Combines multiple diagnostic plots into a single figure
+#' 
+#' @param comparison_table Output from compare_to_ground_truth()
+#' @param naive_workflows Fitted naive models
+#' @param causal_workflows Fitted causal models
+#' @return A patchwork composite plot
+create_validation_dashboard <- function(comparison_table, naive_workflows, causal_workflows) {
+  
+  # Main comparison
+  p_main <- plot_ground_truth_comparison(comparison_table)
+  
+  # Create a summary table plot
+  table_data <- comparison_table |>
+    mutate(
+      Estimate = round(Estimate, 3),
+      Std_Error = round(Std_Error, 3),
+      Bias = round(Bias, 3),
+      Pct_Bias = paste0(round(Pct_Bias, 1), "%")
+    ) |>
+    select(Method, Estimate, Std_Error, Bias, Pct_Bias, Direction)
+  
+  # Create table grob
+  p_table <- gridExtra::tableGrob(
+    table_data,
+    rows = NULL,
+    theme = gridExtra::ttheme_minimal(
+      core = list(fg_params = list(hjust = 0, x = 0.1, fontsize = 9)),
+      colhead = list(fg_params = list(fontface = "bold", fontsize = 10))
+    )
+  )
+  
+  # Combine with patchwork
+  combined <- p_main / 
+    patchwork::wrap_elements(p_table) +
+    plot_layout(heights = c(3, 1.5))
+  
+  return(combined)
+}
