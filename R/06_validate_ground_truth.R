@@ -5,44 +5,54 @@ library(tibble)
 #' Get Ground Truth Causal Effect
 #'
 #' Returns the true causal effect baked into the data generating process.
-#' This is the effect we embedded in the simulation (0.5 log-odds).
-#' 
-#' @return A list containing the true effect on different scales
+#'
+#' Two estimands are reported:
+#'   - log_odds: the structural coefficient (+0.5) on the log-odds scale. NOTE:
+#'     logistic coefficients are NON-COLLAPSIBLE, so a correctly-specified causal
+#'     model estimates a slightly attenuated value (~0.43) when a strong latent
+#'     cause of the outcome (impatience) is unmeasured. The SIGN and the marginal
+#'     effect are what matter for decisions.
+#'   - ate_pp: the TRUE marginal Average Treatment Effect (risk difference),
+#'     computed via g-computation on the DGP. This is collapsible and is the
+#'     honest, business-facing headline number (~+6.8 percentage points).
+#'
+#' @return A list with the true effect on different scales.
 get_ground_truth_ate <- function() {
-  
-  # From the structural equation in simulate_delivery_data():
-  # log_odds_churn = -2.0 + (0.5 * has_exception) + ...
-  # The coefficient 0.5 is the true causal effect (log-odds scale)
-  
+
   true_log_odds_effect <- 0.5
-  
-  # Convert to odds ratio
   true_odds_ratio <- exp(true_log_odds_effect)
-  
-  # For interpretation: approximate risk difference (marginal effect)
-  # This is context-dependent but useful for business communication
-  # Calculated by simulating counterfactual outcomes
-  
+
+  # True marginal ATE recovered by g-computation on the DGP (see verify scripts).
+  # Re-derived here so the number is reproducible from the structural equations.
+  inv_logit <- function(x) 1 / (1 + exp(-x))
+  set.seed(2026)
+  n <- 300000
+  order_volume <- rnorm(n)
+  impatience   <- rnorm(n)
+  spend_z      <- as.numeric(scale(round(rlnorm(n, 4, 0.5), 2)))
+  lin <- function(exc) {
+    -1.0 + 0.5 * exc + (-2.0) * order_volume + 1.0 * impatience + (-0.3) * spend_z
+  }
+  true_ate <- mean(inv_logit(lin(1)) - inv_logit(lin(0)))
+
   list(
     log_odds = true_log_odds_effect,
     odds_ratio = true_odds_ratio,
+    ate_pp = true_ate * 100,
     interpretation = paste0(
-      "Delivery exceptions increase the odds of churn by ",
-      round((true_odds_ratio - 1) * 100, 1),
-      "% (OR = ", round(true_odds_ratio, 2), ")"
+      "Delivery exceptions causally INCREASE churn by ~",
+      round(true_ate * 100, 1),
+      " percentage points (true marginal ATE)."
     )
   )
 }
 
 #' Extract Coefficient from Fitted Model
 #'
-#' Helper function to extract the has_exception coefficient from a fitted workflow
-#' 
 #' @param fitted_workflow A fitted tidymodels workflow
-#' @param term_name The name of the coefficient to extract
+#' @param term_name The coefficient to extract
 #' @return A tibble with estimate and std.error
 extract_exception_coefficient <- function(fitted_workflow, term_name = "has_exception") {
-  
   fitted_workflow |>
     extract_fit_parsnip() |>
     tidy() |>
@@ -50,128 +60,131 @@ extract_exception_coefficient <- function(fitted_workflow, term_name = "has_exce
     select(term, estimate, std.error)
 }
 
-#' Compare All Estimates to Ground Truth
+#' Compute Marginal ATE via G-Computation
 #'
-#' Creates a comprehensive comparison table showing:
-#' - Ground truth (from DGP)
-#' - Naive estimate (conditioning on collider)
-#' - Causal estimate (DAG-guided)
-#' 
-#' @param naive_workflows Fitted naive models from fit_naive_models()
-#' @param causal_workflows Fitted causal models from fit_causal_models()
-#' @return A tibble with comparison metrics
-compare_to_ground_truth <- function(naive_workflows, causal_workflows) {
-  
-  # Get ground truth
-  truth <- get_ground_truth_ate()
-  
-  # Extract naive GLM coefficient (with collider)
-  naive_coef <- naive_workflows |>
-    filter(wflow_id == "base_rec_glm") |>
-    pull(fit) |>
-    _[[1]] |>
-    extract_exception_coefficient()
-  
-  # Extract causal GLM coefficient (without collider)
-  causal_coef <- causal_workflows |>
-    filter(wflow_id == "causal_rec_glm") |>
-    pull(fit) |>
-    _[[1]] |>
-    extract_exception_coefficient()
-  
-  # Build comparison table
-  comparison <- tibble(
-    Method = c("Ground Truth (DGP)", "Naive Model (w/ Collider)", "Causal Model (DAG-Guided)"),
-    Estimate = c(truth$log_odds, naive_coef$estimate, causal_coef$estimate),
-    Std_Error = c(NA_real_, naive_coef$std.error, causal_coef$std.error),
-    Bias = c(0, naive_coef$estimate - truth$log_odds, causal_coef$estimate - truth$log_odds),
-    Pct_Bias = c(0, 
-                 (naive_coef$estimate - truth$log_odds) / truth$log_odds * 100,
-                 (causal_coef$estimate - truth$log_odds) / truth$log_odds * 100),
-    Direction = c("Positive (Increases Churn)", 
-                  ifelse(naive_coef$estimate > 0, "Positive (Increases Churn)", "NEGATIVE (Decreases Churn) WARNING"),
-                  ifelse(causal_coef$estimate > 0, "Positive (Increases Churn)", "Negative (Decreases Churn)"))
-  )
-  
-  return(comparison)
-}
-
-#' Compute Marginal Treatment Effect via G-Computation
+#' Calculates the Average Treatment Effect (risk difference) by simulating the
+#' counterfactual world where everyone / no one experiences an exception.
+#' This is the collapsible, decision-relevant estimand.
 #'
-#' Calculates the Average Treatment Effect by simulating counterfactual outcomes.
-#' This gives us the effect on the probability scale (risk difference).
-#' 
 #' @param data The simulated dataset
-#' @param fitted_workflow A fitted tidymodels workflow (should be causal model)
-#' @return A list with ATE estimate and interpretation
+#' @param fitted_workflow A fitted tidymodels workflow
+#' @return A list with the ATE estimate (proportion + percentage points)
 compute_marginal_ate <- function(data, fitted_workflow) {
-  
-  # Convert churned to numeric for prediction
-  data_numeric <- data |>
-    mutate(churn_numeric = as.numeric(as.character(churned)))
-  
-  # Create counterfactual datasets
-  data_treated <- data_numeric |> mutate(has_exception = 1)
-  data_control <- data_numeric |> mutate(has_exception = 0)
-  
-  # Predict under both scenarios
+
+  data_treated <- data |> mutate(has_exception = 1L)
+  data_control <- data |> mutate(has_exception = 0L)
+
   pred_treated <- predict(fitted_workflow, new_data = data_treated, type = "prob") |>
     pull(.pred_1)
-  
   pred_control <- predict(fitted_workflow, new_data = data_control, type = "prob") |>
     pull(.pred_1)
-  
-  # Calculate Average Treatment Effect (Risk Difference)
-  ate_risk_diff <- mean(pred_treated - pred_control)
-  
+
+  ate <- mean(pred_treated - pred_control)
+
   list(
-    risk_difference = ate_risk_diff,
+    risk_difference = ate,
+    ate_pp = ate * 100,
     interpretation = paste0(
-      "Delivery exceptions increase churn probability by ",
-      round(ate_risk_diff * 100, 2),
-      " percentage points"
+      "Estimated effect: ",
+      round(ate * 100, 2),
+      " percentage points on churn probability."
     )
   )
 }
 
-#' Bootstrap Confidence Intervals for ATE
+#' Compare All Estimates to Ground Truth (Marginal ATE, percentage points)
 #'
-#' Computes bootstrap confidence intervals for the causal effect estimate.
-#' 
+#' Builds the headline comparison table on the risk-difference scale, which is
+#' both collapsible and business-interpretable.
+#'
 #' @param data The simulated dataset
-#' @param n_bootstrap Number of bootstrap samples (default: 1000)
-#' @param seed Random seed for reproducibility
-#' @return A tibble with estimate and confidence intervals
+#' @param naive_workflows Fitted naive models from fit_naive_models()
+#' @param causal_workflows Fitted causal models from fit_causal_models()
+#' @return A tibble with comparison metrics on the ATE (pp) scale
+compare_to_ground_truth <- function(data, naive_workflows, causal_workflows) {
+
+  truth <- get_ground_truth_ate()
+
+  naive_glm <- naive_workflows |>
+    filter(wflow_id == "base_rec_glm") |>
+    pull(fit) |>
+    _[[1]]
+
+  causal_glm <- causal_workflows |>
+    filter(wflow_id == "causal_rec_glm") |>
+    pull(fit) |>
+    _[[1]]
+
+  naive_ate <- compute_marginal_ate(data, naive_glm)$ate_pp
+  causal_ate <- compute_marginal_ate(data, causal_glm)$ate_pp
+  true_ate <- truth$ate_pp
+
+  tibble(
+    Method = c("Ground Truth (DGP)", "Naive Model (Simpson + Collider)", "Causal Model (DAG-Guided)"),
+    ATE_pp = c(true_ate, naive_ate, causal_ate),
+    Bias_pp = c(0, naive_ate - true_ate, causal_ate - true_ate),
+    Direction = c(
+      "Positive (Increases Churn)",
+      ifelse(naive_ate > 0, "Positive", "NEGATIVE (Decreases Churn) -- WRONG"),
+      ifelse(causal_ate > 0, "Positive (Increases Churn)", "Negative")
+    )
+  )
+}
+
+#' Bootstrap Confidence Interval for the Causal ATE
+#'
+#' Percentile bootstrap CI for the DAG-guided marginal ATE (percentage points).
+#'
+#' @param data The simulated dataset
+#' @param n_bootstrap Number of bootstrap resamples (default 1000)
+#' @param seed Random seed
+#' @return A tibble with the ATE estimate and 95% CI (percentage points)
 bootstrap_ate_ci <- function(data, n_bootstrap = 1000, seed = 2026) {
-  
+
   set.seed(seed)
-  
-  # Convert churned to numeric
   data_numeric <- data |>
     mutate(churn_numeric = as.numeric(as.character(churned)))
-  
-  bootstrap_estimates <- replicate(n_bootstrap, {
-    # Resample with replacement
-    boot_sample <- data_numeric |>
-      slice_sample(n = nrow(data_numeric), replace = TRUE)
-    
-    # Fit causal model (without collider)
-    boot_model <- glm(
-      churn_numeric ~ has_exception + impatience_score + 
-        account_tenure_months + monthly_spend_usd,
-      data = boot_sample,
-      family = binomial()
+
+  estimates <- replicate(n_bootstrap, {
+    boot <- data_numeric |> slice_sample(n = nrow(data_numeric), replace = TRUE)
+    m <- glm(
+      churn_numeric ~ has_exception + order_volume + monthly_spend_usd,
+      data = boot, family = binomial()
     )
-    
-    # Extract coefficient
-    coef(boot_model)["has_exception"]
+    d1 <- boot |> mutate(has_exception = 1L)
+    d0 <- boot |> mutate(has_exception = 0L)
+    mean(predict(m, d1, type = "response") - predict(m, d0, type = "response")) * 100
   })
-  
-  # Calculate percentile confidence intervals
+
   tibble(
-    Estimate = mean(bootstrap_estimates),
-    CI_Lower = quantile(bootstrap_estimates, 0.025),
-    CI_Upper = quantile(bootstrap_estimates, 0.975),
-    Std_Error = sd(bootstrap_estimates)
+    ATE_pp = mean(estimates),
+    CI_Lower = quantile(estimates, 0.025),
+    CI_Upper = quantile(estimates, 0.975),
+    Std_Error = sd(estimates)
+  )
+}
+
+#' E-value Sensitivity Analysis (Backup Slide)
+#'
+#' Quantifies how strong an UNMEASURED confounder would need to be -- associated
+#' with both treatment and outcome -- to fully explain away the causal estimate.
+#' Uses the VanderWeele & Ding (2017) approximation on the odds-ratio scale.
+#'
+#' In this scenario the latent `impatience` is exactly such an unmeasured cause:
+#' the E-value tells us how much robustness the finding has against it.
+#'
+#' @param odds_ratio The causal odds ratio (exp of the causal log-odds estimate)
+#' @return A list with the E-value for the point estimate
+compute_evalue <- function(odds_ratio) {
+  or <- ifelse(odds_ratio < 1, 1 / odds_ratio, odds_ratio)
+  evalue <- or + sqrt(or * (or - 1))
+  list(
+    odds_ratio = odds_ratio,
+    evalue = evalue,
+    interpretation = paste0(
+      "An unmeasured confounder would need an association of at least ",
+      round(evalue, 2),
+      "x with BOTH exception and churn (beyond measured covariates) to nullify the effect."
+    )
   )
 }

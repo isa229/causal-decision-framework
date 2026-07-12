@@ -6,96 +6,103 @@ inv_logit <- function(x) {
   1 / (1 + exp(-x))
 }
 
-#' Simulate Delivery Customer Data (Enterprise Collider Bias)
-#' 
-#' Generates a synthetic dataset mimicking an enterprise database.
-#' Includes the "Bad Control" (opened_support_ticket) collider trap.
-#' 
-#' @param n_customers Integer. Number of customers to simulate. Default is 10000.
-#' @param seed Integer. Random seed for reproducibility. Default is 42.
-#' @return A tibble with observed variables ready for modeling.
-simulate_delivery_data <- function(n_customers = 10000, seed = 42) {
-  
+#' Simulate Delivery Customer Data (Simpson's Paradox + Collider Trap)
+#'
+#' Generates a synthetic dataset mimicking an enterprise customer database.
+#'
+#' The Data Generating Process (DGP) embeds TWO classic causal traps:
+#'
+#'   1. SIMPSON'S PARADOX (confounding via Order_Volume):
+#'      High-engagement / high-volume customers place many orders, so by sheer
+#'      exposure they encounter MORE delivery exceptions. Yet these loyal,
+#'      high-volume customers churn far LESS. Order_Volume therefore confounds
+#'      the Exception -> Churn relationship: in the AGGREGATE, exceptions look
+#'      like they REDUCE churn (wrong sign), but WITHIN each volume stratum the
+#'      true positive effect re-appears. The fix is to ADD (adjust for) volume.
+#'
+#'   2. COLLIDER BIAS (Support_Ticket):
+#'      Both delivery exceptions AND (latent) customer impatience drive opening a
+#'      support ticket. Support_Ticket is therefore a COLLIDER. Conditioning on
+#'      it opens a spurious path and biases the estimate. The fix is to REMOVE
+#'      (never adjust for) the ticket.
+#'
+#' Note on `impatience`: it is a LATENT trait. It is used to generate the data
+#' but is deliberately NOT returned in the final dataset. It plays two roles:
+#'   - a parent of the collider (Support_Ticket), and
+#'   - an unmeasured cause of Churn (the basis for the E-value backup slide).
+#'
+#' The TRUE structural effect of `has_exception` on churn is +0.5 on the
+#' log-odds scale. Because logistic coefficients are non-collapsible, the most
+#' honest headline estimand is the MARGINAL Average Treatment Effect (ATE) on
+#' the probability (risk-difference) scale, recovered via g-computation.
+#'
+#' @param n_customers Integer. Number of customers to simulate. Default 50000.
+#' @param seed Integer. Random seed for reproducibility. Default 2026.
+#' @return A tibble of OBSERVED variables ready for modeling (impatience hidden).
+simulate_delivery_data <- function(n_customers = 50000, seed = 2026) {
+
   set.seed(seed)
-  
+
   # ----------------------------------------------------------------------------
-  # 1. Generate The Core Causal Physics & Exogenous Variables
+  # 1. Exogenous variables (the root causes)
   # ----------------------------------------------------------------------------
-  data <- tibble(
-    customer_id = 1:n_customers,
-    
-    # --- MEASURED BEHAVIORAL TRAIT (Survey Score) ---
-    # This represents customer impatience measured via survey
-    # Scale: -3 (very patient) to +3 (very impatient)
-    impatience_score = rnorm(n_customers, mean = 0, sd = 1),
-    
-    # --- THE TREATMENT (Randomly Assigned by Logistics) ---
-    # Delivery exceptions occur independently of customer traits
-    has_exception = rbinom(n_customers, size = 1, prob = 0.15),
-    
-    # --- PRECISION COVARIATES ---
-    account_tenure_months = round(runif(n_customers, min = 1, max = 60)),
-    monthly_spend_usd     = round(rlnorm(n_customers, meanlog = 4, sdlog = 0.5), 2),
-    
-    # --- PURE NOISE VARIABLES (should be filtered by models) ---
-    customer_age_years       = round(rnorm(n_customers, mean = 40, sd = 12)),
-    marketing_emails_clicked = rpois(n_customers, lambda = 2),
-    app_logins_last_7_days   = rpois(n_customers, lambda = 3)
+  # CONFOUNDER (observed): standardized customer engagement / order-frequency
+  # score. Positive = high-volume, highly-engaged, loyal customer.
+  order_volume <- rnorm(n_customers, mean = 0, sd = 1)
+
+  # LATENT TRAIT (unobserved): customer impatience. NOT returned in the data.
+  impatience <- rnorm(n_customers, mean = 0, sd = 1)
+
+  # Spend (observed precision covariate). Standardized version drives the DGP.
+  monthly_spend_usd <- round(rlnorm(n_customers, meanlog = 4, sdlog = 0.5), 2)
+  spend_z <- as.numeric(scale(monthly_spend_usd))
+
+  # ----------------------------------------------------------------------------
+  # 2. Treatment: delivery exceptions (driven by order volume -> CONFOUNDING)
+  # ----------------------------------------------------------------------------
+  # More orders => more chances for something to go wrong => more exceptions.
+  log_odds_exception <- -1.0 + (1.5 * order_volume)
+  has_exception <- rbinom(n_customers, size = 1, prob = inv_logit(log_odds_exception))
+
+  # ----------------------------------------------------------------------------
+  # 3. Collider: support ticket (driven by BOTH exception AND latent impatience)
+  # ----------------------------------------------------------------------------
+  log_odds_ticket <- -3.0 + (2.5 * has_exception) + (2.5 * impatience)
+  opened_support_ticket <- rbinom(n_customers, size = 1, prob = inv_logit(log_odds_ticket))
+
+  # ----------------------------------------------------------------------------
+  # 4. Outcome: churn
+  # ----------------------------------------------------------------------------
+  #   +0.5  * has_exception   <- TRUE causal effect (log-odds) we will recover
+  #   -2.0  * order_volume    <- loyal/high-volume customers churn much less
+  #   +1.0  * impatience      <- LATENT cause of churn (powers the E-value story)
+  #   -0.3  * spend_z         <- precision covariate
+  log_odds_churn <- -1.0 +
+    (0.5 * has_exception) +
+    (-2.0 * order_volume) +
+    (1.0 * impatience) +
+    (-0.3 * spend_z)
+  churned <- rbinom(n_customers, size = 1, prob = inv_logit(log_odds_churn))
+
+  # ----------------------------------------------------------------------------
+  # 5. Pure noise variables (should be filtered out by good modeling)
+  # ----------------------------------------------------------------------------
+  customer_age_years       <- pmax(round(rnorm(n_customers, mean = 40, sd = 12)), 18)
+  marketing_emails_clicked <- rpois(n_customers, lambda = 2)
+  app_logins_last_7_days   <- rpois(n_customers, lambda = 3)
+
+  # ----------------------------------------------------------------------------
+  # 6. Final formatting (NOTE: `impatience` is intentionally NOT included)
+  # ----------------------------------------------------------------------------
+  tibble(
+    customer_id = seq_len(n_customers),
+    order_volume = order_volume,
+    monthly_spend_usd = monthly_spend_usd,
+    customer_age_years = customer_age_years,
+    marketing_emails_clicked = marketing_emails_clicked,
+    app_logins_last_7_days = app_logins_last_7_days,
+    has_exception = as.integer(has_exception),
+    opened_support_ticket = as.integer(opened_support_ticket),
+    churned = as.factor(churned)
   )
-  
-  data <- data |> mutate(customer_age_years = pmax(customer_age_years, 18))
-  
-  # ----------------------------------------------------------------------------
-  # 2. Generate the Collider (Support Ticket)
-  # ----------------------------------------------------------------------------
-  data <- data |>
-    mutate(
-      # Both variables very strongly drive opening a ticket
-      # Strong effects create dramatic collider bias
-      log_odds_ticket = -3.0 + (4.0 * has_exception) + (4.5 * impatience_score),
-      prob_ticket = inv_logit(log_odds_ticket),
-      opened_support_ticket = rbinom(n(), size = 1, prob = prob_ticket)
-    )
-  
-  # ----------------------------------------------------------------------------
-  # 3. Generate the Outcome (Churn)
-  # ----------------------------------------------------------------------------
-  data <- data |>
-    mutate(
-      # The true causal effect of exception is 0.5 log-odds
-      # (This is the parameter we will try to recover with causal methods)
-      # Impatience has a very strong effect, drives both tickets and churn
-      # Tenure and Spend provide precision adjustments
-      log_odds_churn = -1.5 + 
-                       (0.5 * has_exception) +           # True causal effect
-                       (4.5 * impatience_score) +        # Strong confounder
-                       (-0.03 * account_tenure_months) + 
-                       (-0.003 * monthly_spend_usd),
-      prob_churn = inv_logit(log_odds_churn),
-      churned = rbinom(n(), size = 1, prob = prob_churn)
-    )
-  
-  # ----------------------------------------------------------------------------
-  # 4. Final Formatting
-  # ----------------------------------------------------------------------------
-  final_data <- data |>
-    select(
-      customer_id,
-      account_tenure_months,
-      monthly_spend_usd,
-      customer_age_years,
-      marketing_emails_clicked,
-      app_logins_last_7_days,
-      impatience_score,
-      has_exception,
-      opened_support_ticket,
-      churned
-    ) |>
-    mutate(
-      has_exception = as.integer(has_exception),
-      opened_support_ticket = as.integer(opened_support_ticket),
-      churned = as.factor(churned)
-    )
-  
-  return(final_data)
 }
