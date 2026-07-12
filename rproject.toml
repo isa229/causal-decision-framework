@@ -20,4 +20,7 @@ dependencies = [
     { name = "here", repository = "PPM" },
     { name = "dagitty", repository = "PPM" },
     { name = "ggdag", repository = "PPM" },
+    { name = "patchwork", repository = "PPM" },
+    { name = "gridExtra", repository = "PPM" },
+    { name = "purrr", repository = "PPM" },
 ]
