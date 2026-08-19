@@ -131,7 +131,56 @@ compare_to_ground_truth <- function(data, naive_workflows, causal_workflows) {
   )
 }
 
+#' Evaluate Predictive Performance (Test-Set AUC)
+#'
+#' Fits three logistic specifications on a training split and reports ROC AUC on
+#' the held-out test split. 
+#'
+#' The three specifications tell the option-(c) story:
+#'   - "Kitchen-Sink"  : everything, including the collider (opened_support_ticket)
+#'                       and the confounder (order_volume). The collider is a
+#'                       strong predictor, so this usually has the HIGHEST AUC --
+#'                       yet its causal estimate for `has_exception` is biased
+#'                       toward the null (the SILENT failure).
+#'   - "Aggregate"     : churn ~ exception only. Omitting the confounder produces
+#'                       the WRONG SIGN (the LOUD failure).
+#'   - "Causal"        : DAG-guided (add confounder, drop collider).
+#'
+#' @param data The simulated dataset
+#' @param seed Random seed for the split (kept consistent with the model fits)
+#' @return A tibble with AUC per specification
+evaluate_predictive_performance <- function(data, seed = 123) {
+
+  set.seed(seed)
+  split <- initial_split(data, prop = 0.8, strata = churned)
+  train <- training(split) |>
+    mutate(churn_f = factor(churned, levels = c("0", "1")))
+  test  <- testing(split) |>
+    mutate(churn_f = factor(churned, levels = c("0", "1")))
+
+  specs <- list(
+    "Kitchen-Sink (keeps collider)" =
+      churn_f ~ has_exception + order_volume + monthly_spend_usd +
+        opened_support_ticket + customer_age_years +
+        marketing_emails_clicked + app_logins_last_7_days,
+    "Aggregate (omits confounder)" =
+      churn_f ~ has_exception,
+    "Causal (DAG-guided)" =
+      churn_f ~ has_exception + order_volume + monthly_spend_usd
+  )
+
+  purrr::map_dfr(names(specs), function(nm) {
+    m <- glm(specs[[nm]], data = train, family = binomial())
+    test_pred <- test |>
+      mutate(.pred_1 = predict(m, newdata = test, type = "response"))
+    auc <- yardstick::roc_auc(test_pred, truth = churn_f, .pred_1,
+                              event_level = "second")$.estimate
+    tibble(Specification = nm, Test_AUC = auc)
+  })
+}
+
 #' Bootstrap Confidence Interval for the Causal ATE
+
 #'
 #' Percentile bootstrap CI for the DAG-guided marginal ATE (percentage points).
 #'
@@ -168,23 +217,40 @@ bootstrap_ate_ci <- function(data, n_bootstrap = 1000, seed = 2026) {
 #'
 #' Quantifies how strong an UNMEASURED confounder would need to be -- associated
 #' with both treatment and outcome -- to fully explain away the causal estimate.
-#' Uses the VanderWeele & Ding (2017) approximation on the odds-ratio scale.
+#' Uses the VanderWeele & Ding (2017) formula.
+#'
+#' IMPORTANT (common vs rare outcome): the E-value formula is defined on the RISK
+#' RATIO scale. An odds ratio only approximates the risk ratio when the outcome is
+#' RARE. Churn here is COMMON (base rate ~25-30%), so using the OR directly would
+#' OVERSTATE the E-value. Following VanderWeele & Ding (2017), for a common outcome
+#' we first convert the OR to an approximate RR via RR ~ sqrt(OR) before applying
+#' the E-value formula. Set `rare_outcome = TRUE` to skip this conversion.
 #'
 #' In this scenario the latent `impatience` is exactly such an unmeasured cause:
 #' the E-value tells us how much robustness the finding has against it.
 #'
 #' @param odds_ratio The causal odds ratio (exp of the causal log-odds estimate)
+#' @param rare_outcome Logical. If FALSE (default), converts OR -> RR via sqrt(OR)
+#'   because the outcome is common. If TRUE, treats the OR as the RR directly.
 #' @return A list with the E-value for the point estimate
-compute_evalue <- function(odds_ratio) {
+compute_evalue <- function(odds_ratio, rare_outcome = FALSE) {
   or <- ifelse(odds_ratio < 1, 1 / odds_ratio, odds_ratio)
-  evalue <- or + sqrt(or * (or - 1))
+
+  # Convert OR to an approximate RR for a common outcome (VanderWeele & Ding 2017).
+  rr <- if (rare_outcome) or else sqrt(or)
+
+  evalue <- rr + sqrt(rr * (rr - 1))
   list(
     odds_ratio = odds_ratio,
+    risk_ratio_approx = rr,
+    rare_outcome = rare_outcome,
     evalue = evalue,
     interpretation = paste0(
       "An unmeasured confounder would need an association of at least ",
       round(evalue, 2),
-      "x with BOTH exception and churn (beyond measured covariates) to nullify the effect."
+      "x (on the risk-ratio scale) with BOTH exception and churn (beyond measured ",
+      "covariates) to nullify the effect."
     )
   )
 }
+

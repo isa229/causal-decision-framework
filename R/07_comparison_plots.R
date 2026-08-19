@@ -63,15 +63,21 @@ plot_ground_truth_comparison <- function(comparison_table) {
 
 #' Plot Coefficient Trajectories Across Model Specifications (Log-Odds)
 #'
-#' Shows how the `has_exception` estimate moves as we change the adjustment set.
-#' Demonstrates that ONLY the DAG-guided specification (add confounder, drop
-#' collider) recovers the correct positive sign.
+#' Shows how the `has_exception` estimate moves as we change the adjustment set,
+#' and makes explicit that colliders and confounders cause TWO DIFFERENT kinds of
+#' failure:
+#'
+#'   - LOUD failure (wrong sign): omitting the confounder flips the sign. Anyone
+#'     looking at the coefficient sees something is off ("delays reduce churn?!").
+#'   - SILENT failure (erased effect): a kitchen-sink model that keeps the
+#'     collider drags the estimate toward ZERO. The sign may even look plausible,
+#'     but the true effect has been quietly erased -- the more dangerous mistake,
+#'     because nothing screams "wrong".
 #'
 #' Specifications (impatience is LATENT and never available):
-#'   - "Aggregate"        : churn ~ exception                 (Simpson's: wrong sign)
-#'   - "Naive ML"         : + support_ticket + spend          (collider too: wrong sign)
-#'   - "DAG-Guided"       : + order_volume + spend, NO ticket (correct sign)
-#'   - "Over-Adjusted"    : DAG-guided + support_ticket       (re-introduces collider bias)
+#'   - "Aggregate"     : churn ~ exception                       (LOUD: wrong sign)
+#'   - "Kitchen-Sink"  : + order_volume + spend + support_ticket (SILENT: ~0)
+#'   - "DAG-Guided"    : + order_volume + spend, NO ticket        (correct sign)
 #'
 #' @param data The simulated dataset
 #' @return A ggplot object
@@ -81,18 +87,21 @@ plot_coefficient_trajectory <- function(data) {
     mutate(churn_numeric = as.numeric(as.character(churned)))
 
   models <- list(
-    "Aggregate" = glm(churn_numeric ~ has_exception,
-                      data = data_numeric, family = binomial()),
+    "Aggregate\n(omit confounder)" =
+      glm(churn_numeric ~ has_exception,
+          data = data_numeric, family = binomial()),
 
-    "Naive ML" = glm(churn_numeric ~ has_exception + opened_support_ticket + monthly_spend_usd,
-                     data = data_numeric, family = binomial()),
+    "Kitchen-Sink\n(keep collider)" =
+      glm(churn_numeric ~ has_exception + order_volume + monthly_spend_usd +
+            opened_support_ticket,
+          data = data_numeric, family = binomial()),
 
-    "DAG-Guided" = glm(churn_numeric ~ has_exception + order_volume + monthly_spend_usd,
-                       data = data_numeric, family = binomial()),
-
-    "Over-Adjusted" = glm(churn_numeric ~ has_exception + order_volume + monthly_spend_usd + opened_support_ticket,
-                          data = data_numeric, family = binomial())
+    "DAG-Guided\n(add conf., drop collider)" =
+      glm(churn_numeric ~ has_exception + order_volume + monthly_spend_usd,
+          data = data_numeric, family = binomial())
   )
+
+  lvls <- names(models)
 
   coefs <- purrr::map_dfr(names(models), function(name) {
     broom::tidy(models[[name]]) |>
@@ -100,14 +109,15 @@ plot_coefficient_trajectory <- function(data) {
       mutate(Model = name)
   }) |>
     mutate(
-      Model = factor(Model, levels = c("Aggregate", "Naive ML", "DAG-Guided", "Over-Adjusted")),
-      Color = case_when(
-        Model == "DAG-Guided" ~ "correct",
-        TRUE ~ "wrong"
+      Model = factor(Model, levels = lvls),
+      Failure = case_when(
+        grepl("DAG-Guided", Model) ~ "correct",
+        grepl("Aggregate", Model)  ~ "loud",     # wrong sign
+        TRUE                       ~ "silent"    # erased toward null
       )
     )
 
-  ggplot(coefs, aes(x = Model, y = estimate, color = Color, group = 1)) +
+  ggplot(coefs, aes(x = Model, y = estimate, color = Failure, group = 1)) +
     geom_hline(yintercept = 0.5, linetype = "dashed", color = "darkgreen", linewidth = 0.8) +
     geom_hline(yintercept = 0, linetype = "dotted", color = "gray50") +
     geom_line(linewidth = 1.2, color = "gray40") +
@@ -116,12 +126,19 @@ plot_coefficient_trajectory <- function(data) {
                       ymax = estimate + 1.96 * std.error),
                   width = 0.2, linewidth = 1) +
     scale_color_manual(
-      values = c("correct" = "#1565C0", "wrong" = "#C62828"),
-      guide = "none"
+      values = c("correct" = "#1565C0", "loud" = "#C62828", "silent" = "#EF6C00"),
+      labels = c("correct" = "Correct (DAG-guided)",
+                 "loud" = "Loud failure: wrong sign",
+                 "silent" = "Silent failure: effect erased"),
+      name = NULL
     ) +
     labs(
-      title = "Effect Estimate Across Model Specifications",
-      subtitle = "Only the DAG-guided model (add confounder, drop collider) recovers the truth.",
+      title = "Two Ways to Get It Wrong: Loud (Sign Flip) vs Silent (Erased)",
+      subtitle = paste(
+        "Omitting the confounder flips the sign (loud). Keeping the collider drags the",
+        "true effect toward zero (silent) -- arguably the more dangerous error.",
+        sep = "\n"
+      ),
       x = NULL,
       y = "Effect of Exceptions on Churn (Log-Odds)",
       caption = "Green dashed line = true structural coefficient (0.5). Error bars are 95% CIs."
@@ -129,10 +146,12 @@ plot_coefficient_trajectory <- function(data) {
     theme_minimal(base_size = 13) +
     theme(
       plot.title = element_text(face = "bold"),
+      legend.position = "top",
       axis.text.x = element_text(angle = 15, hjust = 1, face = "bold"),
       panel.grid.major.x = element_blank()
     )
 }
+
 
 #' Plot Simpson's Paradox (Two-Line Decile Plot)
 #'
