@@ -27,6 +27,9 @@ fit_causal_models <- function(data) {
   # The DAG-guided recipe:
   #   keep: has_exception (treatment), order_volume (confounder), monthly_spend_usd (precision)
   #   drop: opened_support_ticket (COLLIDER) + noise variables
+  # NOTE: exclude the binary treatment from normalization so the reported
+  # log-odds coefficient (and the OR fed into the E-value) is a per-unit
+  # treatment effect, not a per-SD-of-a-0/1-variable effect.
   causal_recipe <- recipe(churned ~ ., data = train_data) |>
     update_role(customer_id, new_role = "ID") |>
     step_rm(
@@ -36,7 +39,8 @@ fit_causal_models <- function(data) {
       app_logins_last_7_days
     ) |>
     step_dummy(all_nominal_predictors()) |>
-    step_normalize(all_numeric_predictors())
+    step_normalize(all_numeric_predictors(), -has_exception)
+
 
   log_spec <- logistic_reg() |>
     set_engine("glm") |>

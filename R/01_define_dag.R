@@ -6,7 +6,7 @@ library(broom)
 
 #' Define and Plot the Causal DAG
 #'
-#' Formalizes the business assumptions about the Data Generating Process.
+#' Formalizes the business assumptions about the Data Generating Process
 #'
 #' The DAG encodes two classic traps:
 #'   - SIMPSON'S PARADOX: Order_Volume -> Exception and Order_Volume -> Churn,
@@ -14,7 +14,7 @@ library(broom)
 #'   - COLLIDER BIAS: Exception -> Support_Ticket <- Impatience, so Support_Ticket
 #'     is a COLLIDER. It must NOT be adjusted for.
 #'
-#' Impatience is LATENT (unobserved). It is drawn dashed/conceptually because it
+#' Impatience is LATENT (unobserved). For this case, it is drawn dashed/conceptually because it
 #' is a parent of the collider and an unmeasured cause of churn.
 #'
 #' @return A list containing the dagitty object and a ggplot diagram.
@@ -55,7 +55,7 @@ define_causal_dag <- function() {
 #'
 #' Asks dagitty which variables we MUST include to identify the true causal
 #' effect of Exception on Churn. For this DAG the minimal sufficient adjustment
-#' set is { Order_Volume } -- and notably it does NOT include Support_Ticket.
+#' set is { Order_Volume }, and notably it does NOT include Support_Ticket.
 #'
 #' @param dag_obj The dagitty object from define_causal_dag()
 get_adjustment_strategy <- function(dag_obj) {

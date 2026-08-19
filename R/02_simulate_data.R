@@ -29,16 +29,16 @@ inv_logit <- function(x) {
 #' Note on `impatience`: it is a LATENT trait. It is used to generate the data
 #' but is deliberately NOT returned in the final dataset. It plays two roles:
 #'   - a parent of the collider (Support_Ticket), and
-#'   - an unmeasured cause of Churn (the basis for the E-value backup slide).
+#'   - an unmeasured cause of Churn (the basis for the E-value example).
 #'
 #' The TRUE structural effect of `has_exception` on churn is +0.5 on the
 #' log-odds scale. Because logistic coefficients are non-collapsible, the most
 #' honest headline estimand is the MARGINAL Average Treatment Effect (ATE) on
 #' the probability (risk-difference) scale, recovered via g-computation.
 #'
-#' @param n_customers Integer. Number of customers to simulate. Default 50000.
-#' @param seed Integer. Random seed for reproducibility. Default 2026.
-#' @return A tibble of OBSERVED variables ready for modeling (impatience hidden).
+#' @param n_customers Integer. Number of customers to simulate.
+#' @param seed Integer. Random seed for reproducibility.
+#' @return A tibble of observed variables ready for modeling (impatience hidden).
 simulate_delivery_data <- function(n_customers = 50000, seed = 2026) {
 
   set.seed(seed)
@@ -53,7 +53,7 @@ simulate_delivery_data <- function(n_customers = 50000, seed = 2026) {
   # LATENT TRAIT (unobserved): customer impatience. NOT returned in the data.
   impatience <- rnorm(n_customers, mean = 0, sd = 1)
 
-  # Spend (observed precision covariate). Standardized version drives the DGP.
+  # Spend (observed precision covariate). We use a standardized version in the DGP
   monthly_spend_usd <- round(rlnorm(n_customers, meanlog = 4, sdlog = 0.5), 2)
   spend_z <- as.numeric(scale(monthly_spend_usd))
 
@@ -75,7 +75,7 @@ simulate_delivery_data <- function(n_customers = 50000, seed = 2026) {
   # ----------------------------------------------------------------------------
   #   +0.5  * has_exception   <- TRUE causal effect (log-odds) we will recover
   #   -2.0  * order_volume    <- loyal/high-volume customers churn much less
-  #   +1.0  * impatience      <- LATENT cause of churn (powers the E-value story)
+  #   +1.0  * impatience      <- LATENT cause of churn (to be recovered by the E-value)
   #   -0.3  * spend_z         <- precision covariate
   log_odds_churn <- -1.0 +
     (0.5 * has_exception) +
@@ -92,7 +92,7 @@ simulate_delivery_data <- function(n_customers = 50000, seed = 2026) {
   app_logins_last_7_days   <- rpois(n_customers, lambda = 3)
 
   # ----------------------------------------------------------------------------
-  # 6. Final formatting (NOTE: `impatience` is intentionally NOT included)
+  # 6. Final format for simulated data (without impatience)
   # ----------------------------------------------------------------------------
   tibble(
     customer_id = seq_len(n_customers),

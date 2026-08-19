@@ -28,14 +28,16 @@ fit_naive_models <- function(data) {
   train_data <- training(data_split)
 
   # The naive "predictive-first" recipe:
-  #   - remove the confounder (order_volume) to mimic an analyst who never
+  #   - remove the confounder (order_volume) to mimic a data scientist who did not
   #     considered it (Simpson's Paradox backdoor left open)
   #   - KEEP opened_support_ticket (the collider / strongest predictor)
   naive_recipe <- recipe(churned ~ ., data = train_data) |>
     update_role(customer_id, new_role = "ID") |>
     step_rm(order_volume) |>
     step_dummy(all_nominal_predictors()) |>
-    step_normalize(all_numeric_predictors())
+    step_normalize(all_numeric_predictors(),
+                   -has_exception, -opened_support_ticket)
+
 
   log_spec <- logistic_reg() |>
     set_engine("glm") |>
