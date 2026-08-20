@@ -182,13 +182,23 @@ test_that("dagitty identifies {Order_Volume} as the adjustment set (not the coll
 # ==============================================================================
 # E-VALUE sensitivity analysis
 # ==============================================================================
-test_that("E-value is computed correctly and exceeds 1", {
-  ev <- compute_evalue(1.543)
+test_that("E-value is computed correctly for a COMMON outcome (sqrt-OR correction)", {
+  # Churn is a COMMON outcome, so the OR must be converted to an approximate RR
+  # via RR ~ sqrt(OR) before applying the VanderWeele & Ding (2017) formula.
+  ev <- compute_evalue(1.543)  # default: rare_outcome = FALSE
   expect_gt(ev$evalue, 1)
-  # VanderWeele-Ding: OR=1.543 -> E-value ~ 2.46
-  expect_lt(abs(ev$evalue - 2.46), 0.05)
+
+  # RR ~ sqrt(1.543) = 1.242 -> E-value = RR + sqrt(RR*(RR-1)) ~ 1.79
+  expect_equal(ev$risk_ratio_approx, sqrt(1.543), tolerance = 1e-6)
+  expect_lt(abs(ev$evalue - 1.79), 0.05)
+
+  # The rare-outcome path uses the OR directly and yields a LARGER E-value (~2.46).
+  ev_rare <- compute_evalue(1.543, rare_outcome = TRUE)
+  expect_lt(abs(ev_rare$evalue - 2.46), 0.05)
+  expect_gt(ev_rare$evalue, ev$evalue)  # ignoring the correction overstates robustness
 
   # Symmetric for protective ORs
   ev_protective <- compute_evalue(1 / 1.543)
   expect_equal(ev$evalue, ev_protective$evalue, tolerance = 1e-6)
 })
+
