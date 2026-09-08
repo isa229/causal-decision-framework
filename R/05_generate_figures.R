@@ -46,7 +46,7 @@ ggsave(here::here("figures", "02_simpsons_paradox.png"),
 # ------------------------------------------------------------------------------
 # 5. Naive models (the trap)
 # ------------------------------------------------------------------------------
-cat("Step 4/8: Fitting naive models (omit confounder, keep collider)...\n")
+cat("Step 4/8: Fitting naive kitchen-sink models (every feature; keeps the collider)...\n")
 naive_models <- fit_naive_models(df)
 ggsave(here::here("figures", "03_naive_glm_trap.png"),
        plot_glm_trap(naive_models), width = 8, height = 6, dpi = 300, bg = "white")
@@ -91,11 +91,17 @@ cat("\n")
 # 9. E-value sensitivity analysis (backup slide)
 # ------------------------------------------------------------------------------
 cat("Step 8/8: E-value sensitivity analysis (robustness to latent impatience)...\n")
-causal_glm_fit <- causal_models |>
-  dplyr::filter(wflow_id == "causal_rec_glm") |>
-  dplyr::pull(fit) |>
-  _[[1]]
-causal_logodds <- extract_exception_coefficient(causal_glm_fit)$estimate
+# Fit the DAG-guided specification on the RAW scale: the tidymodels workflow
+# normalizes predictors per-SD, which would rescale the odds ratio (and
+# understate the E-value). The per-unit log-odds here matches the
+# coefficient-trajectory figure and the bootstrap CI (both raw-scale glm).
+causal_glm_data <- df |>
+  dplyr::mutate(churn_numeric = as.numeric(as.character(churned)))
+causal_glm_base <- glm(
+  churn_numeric ~ has_exception + order_volume + monthly_spend_usd,
+  data = causal_glm_data, family = binomial()
+)
+causal_logodds <- unname(coef(summary(causal_glm_base))["has_exception", "Estimate"])
 ev <- compute_evalue(exp(causal_logodds))
 cat(sprintf("  Causal OR = %.3f  ->  E-value = %.2f\n", ev$odds_ratio, ev$evalue))
 cat("  ", ev$interpretation, "\n", sep = "")
