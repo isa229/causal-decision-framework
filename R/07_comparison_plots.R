@@ -17,7 +17,7 @@ plot_ground_truth_comparison <- function(comparison_table) {
     mutate(
       Method = factor(Method, levels = c(
         "Ground Truth (DGP)",
-        "Naive Model (Simpson + Collider)",
+        "Naive Model (Kitchen-Sink / Collider)",
         "Causal Model (DAG-Guided)"
       )),
       Color = case_when(
@@ -43,7 +43,7 @@ plot_ground_truth_comparison <- function(comparison_table) {
     labs(
       title = "Validation Against Ground Truth: Causal Framework Recovers True Effect",
       subtitle = paste(
-        "Naive model (omits the confounder, keeps the collider) gets the WRONG SIGN.",
+        "Naive kitchen-sink model (adjusts every confounder, KEEPS the collider) gets the WRONG SIGN.",
         "DAG-guided model recovers the true marginal effect (green line).",
         sep = "\n"
       ),
@@ -69,7 +69,8 @@ plot_ground_truth_comparison <- function(comparison_table) {
 #'
 #' Specifications (impatience is LATENT and never available):
 #'   - "Aggregate"        : churn ~ exception                 (Simpson's: wrong sign)
-#'   - "Naive ML"         : + support_ticket + spend          (collider too: wrong sign)
+#'   - "Naive ML"         : every observed feature            (kitchen-sink; the
+#'                         collider is its only causal error: wrong sign)
 #'   - "DAG-Guided"       : + order_volume + spend, NO ticket (correct sign)
 #'   - "Over-Adjusted"    : DAG-guided + support_ticket       (re-introduces collider bias)
 #'
@@ -84,7 +85,10 @@ plot_coefficient_trajectory <- function(data) {
     "Aggregate" = glm(churn_numeric ~ has_exception,
                       data = data_numeric, family = binomial()),
 
-    "Naive ML" = glm(churn_numeric ~ has_exception + opened_support_ticket + monthly_spend_usd,
+    "Naive ML" = glm(churn_numeric ~ has_exception + order_volume +
+                       monthly_spend_usd + opened_support_ticket +
+                       customer_age_years + marketing_emails_clicked +
+                       app_logins_last_7_days,
                      data = data_numeric, family = binomial()),
 
     "DAG-Guided" = glm(churn_numeric ~ has_exception + order_volume + monthly_spend_usd,
