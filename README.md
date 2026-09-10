@@ -112,6 +112,12 @@ The suite asserts, among other things, that:
 
 ---
 
+## A Note on AI Assistance
+
+For transparency: this repository was built with the assistance of an AI coding agent, used as an **assistant and pair-programmer**. The **main idea, the causal narrative, and the architecture of the workflow are entirely the author's**. The AI contributed in two concrete ways: drafting code (always reviewed, validated, and tested by the author before being committed) and expanding the documentation of each function, with the goal of making the repository more **pedagogical** as a learning resource. All scientific claims are backed by the test suite and the validation script — not by the AI.
+
+---
+
 ## Presented At
 
 **PositConf 2026** — "Beyond Prediction: A Causal Workflow in R for Real-World Problems" (Virtual Session: Modelling, 20 min)
