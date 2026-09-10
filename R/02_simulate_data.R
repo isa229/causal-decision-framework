@@ -50,8 +50,14 @@ inv_logit <- function(x) {
 #'
 #' @param n_customers Integer. Number of customers to simulate. Default 50000.
 #' @param seed Integer. Random seed for reproducibility. Default 2026.
-#' @return A tibble of OBSERVED variables ready for modeling (impatience hidden).
-simulate_delivery_data <- function(n_customers = 50000, seed = 2026) {
+#' @param include_latent Logical. If TRUE, also returns the (normally hidden)
+#'   `impatience` column. Used ONLY by figure scripts that need to make the
+#'   latent trait visible (e.g., the Berkson's Paradox figure, R/12). Default
+#'   FALSE, which matches the real world: modeling code never sees it.
+#' @return A tibble of OBSERVED variables ready for modeling (impatience hidden
+#'   unless include_latent = TRUE).
+simulate_delivery_data <- function(n_customers = 50000, seed = 2026,
+                                   include_latent = FALSE) {
 
   set.seed(seed)
 
@@ -109,9 +115,10 @@ simulate_delivery_data <- function(n_customers = 50000, seed = 2026) {
   app_logins_last_7_days   <- rpois(n_customers, lambda = 3)
 
   # ----------------------------------------------------------------------------
-  # 6. Final formatting (NOTE: `impatience` is intentionally NOT included)
+  # 6. Final formatting (NOTE: `impatience` is intentionally NOT included,
+  #    unless include_latent = TRUE for figure scripts only)
   # ----------------------------------------------------------------------------
-  tibble(
+  out <- tibble(
     customer_id = seq_len(n_customers),
     order_volume = order_volume,
     monthly_spend_usd = monthly_spend_usd,
@@ -122,4 +129,6 @@ simulate_delivery_data <- function(n_customers = 50000, seed = 2026) {
     opened_support_ticket = as.integer(opened_support_ticket),
     churned = as.factor(churned)
   )
+  if (include_latent) out$impatience <- impatience
+  out
 }
