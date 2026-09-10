@@ -5,6 +5,11 @@ library(purrr)
 library(vip)
 library(ggplot2)
 
+if (!identical(getOption("ix_talk_theme_loaded"), TRUE)) {
+  source(if (requireNamespace("here", quietly = TRUE))
+    here::here("R", "00_theme_talk.R") else "R/00_theme_talk.R")
+}
+
 #' Train Multiple Causal Predictive Models (DAG-Guided)
 #'
 #' Trains GLM, Random Forest, and XGBoost models that strictly follow the DAG's
@@ -78,14 +83,10 @@ plot_causal_glm <- function(fitted_workflows) {
     ) |>
     ggplot(aes(x = estimate, y = term, fill = is_positive)) +
     geom_col() +
-    scale_fill_manual(values = c("TRUE" = "darkgreen", "FALSE" = "steelblue")) +
-    theme_minimal() +
-    labs(
-      title = "Causal GLM Coefficients (DAG-Guided)",
-      subtitle = "Adjusting for order_volume and dropping the collider: exceptions INCREASE churn.",
-      x = "Log-Odds Estimate",
-      y = NULL
-    ) +
+    scale_fill_manual(values = c("TRUE" = ix_green, "FALSE" = ix_red)) +
+    labs(title = "DAG-Guided Model Coefficients",
+         x = "Log-Odds Estimate", y = NULL) +
+    theme_talk() +
     theme(legend.position = "none")
 }
 
@@ -100,12 +101,7 @@ plot_causal_xgb <- function(fitted_workflows) {
     _[[1]] |>
     extract_fit_parsnip()
 
-  vip(xgb_fit, geom = "col", aesthetics = list(fill = "darkgreen")) +
-    theme_minimal() +
-    labs(
-      title = "Causal XGBoost Feature Importance",
-      subtitle = "With the collider removed, the model elevates the true causal drivers.",
-      x = "Features",
-      y = "Importance"
-    )
+  vip(xgb_fit, geom = "col", aesthetics = list(fill = ix_green)) +
+    labs(title = "DAG-Guided Model Feature Importance") +
+    theme_talk()
 }

@@ -88,13 +88,13 @@ test_that("The DGP generates a genuine Simpson's Paradox via order_volume", {
 })
 
 # ==============================================================================
-# CONFOUNDING: adjusting for order_volume recovers the correct SIGN
+# CONFOUNDING (data level): omitting order_volume reverses the sign
 # ==============================================================================
-test_that("Adjusting for the confounder flips the naive sign to correct (positive)", {
+test_that("Omitting the confounder reverses the sign; adjusting recovers it", {
   df <- simulate_delivery_data(n_customers = 80000, seed = 2026) |>
     mutate(churn_numeric = as.numeric(as.character(churned)))
 
-  # Naive aggregate (omits confounder): wrong (negative) sign
+  # Unadjusted (omits confounder): wrong (negative) sign -- Simpson's reversal
   naive <- glm(churn_numeric ~ has_exception + monthly_spend_usd,
                data = df, family = binomial())
   naive_coef <- tidy(naive) |> filter(term == "has_exception") |> pull(estimate)
@@ -112,7 +112,7 @@ test_that("Adjusting for the confounder flips the naive sign to correct (positiv
 # ==============================================================================
 # COLLIDER BIAS (support_ticket)
 # ==============================================================================
-test_that("Conditioning on the collider re-introduces bias toward the null", {
+test_that("With the confounder adjusted, the collider ALONE flips the sign", {
   df <- simulate_delivery_data(n_customers = 80000, seed = 2026) |>
     mutate(churn_numeric = as.numeric(as.character(churned)))
 
@@ -125,9 +125,10 @@ test_that("Conditioning on the collider re-introduces bias toward the null", {
   causal_coef   <- tidy(causal)   |> filter(term == "has_exception") |> pull(estimate)
   collider_coef <- tidy(collider) |> filter(term == "has_exception") |> pull(estimate)
 
-  # Adding the collider biases the estimate toward (and through) the null
-  expect_lt(collider_coef, causal_coef,
-            label = "Adding the collider must bias the estimate downward vs the causal model")
+  # Berkson's paradox: with the confounder already adjusted, adding the
+  # collider pushes the estimate through the null into the wrong sign.
+  expect_lt(collider_coef, 0,
+            label = "Collider bias alone must flip the sign to NEGATIVE")
 
   # The collider is itself strongly predictive (why ML keeps it)
   ticket_effect <- tidy(collider) |> filter(term == "opened_support_ticket") |> pull(estimate)
@@ -147,7 +148,9 @@ test_that("Causal model recovers the TRUE marginal ATE; naive gets the wrong sig
 
   causal <- glm(churn_numeric ~ has_exception + order_volume + monthly_spend_usd,
                 data = df, family = binomial())
-  naive  <- glm(churn_numeric ~ has_exception + opened_support_ticket + monthly_spend_usd,
+  naive  <- glm(churn_numeric ~ has_exception + order_volume + monthly_spend_usd +
+                  opened_support_ticket + customer_age_years +
+                  marketing_emails_clicked + app_logins_last_7_days,
                 data = df, family = binomial())
 
   causal_ate <- gcomp_ate(causal, df) * 100
@@ -157,9 +160,9 @@ test_that("Causal model recovers the TRUE marginal ATE; naive gets the wrong sig
   expect_lt(abs(causal_ate - truth$ate_pp), 2.0,
             label = "Causal marginal ATE must be within 2pp of ground truth")
 
-  # Naive ATE is negative (wrong sign)
+  # Kitchen-sink naive ATE (confounder in, collider kept) is negative
   expect_lt(naive_ate, 0,
-            label = "Naive marginal ATE must have the WRONG (negative) sign")
+            label = "Kitchen-sink naive ATE must have the WRONG (negative) sign")
 
   # Causal must be closer to truth than naive
   expect_lt(abs(causal_ate - truth$ate_pp), abs(naive_ate - truth$ate_pp))
@@ -170,6 +173,37 @@ test_that("Causal model recovers the TRUE marginal ATE; naive gets the wrong sig
 # ==============================================================================
 test_that("dagitty identifies {Order_Volume} as the adjustment set (not the collider)", {
   dag <- define_causal_dag()$dag
+# ==============================================================================
+# HEADLINE CONTRACT: good metrics AND wrong advice in the SAME model
+# ==============================================================================
+test_that("Kitchen-sink model: AUC >= 0.80 yet wrong-sign advice", {
+  df <- simulate_delivery_data(n_customers = 50000, seed = 2026) |>
+    mutate(churn_numeric = as.numeric(as.character(churned)))
+
+  kitchen_sink <- glm(churn_numeric ~ has_exception + order_volume +
+                        monthly_spend_usd + opened_support_ticket +
+                        customer_age_years + marketing_emails_clicked +
+                        app_logins_last_7_days,
+                      data = df, family = binomial())
+
+  # In-sample AUC via the Mann-Whitney formulation (ties get average ranks)
+  probs <- predict(kitchen_sink, newdata = df, type = "response")
+  n_pos <- sum(df$churn_numeric == 1)
+  n_neg <- sum(df$churn_numeric == 0)
+  auc <- (sum(rank(probs)[df$churn_numeric == 1]) -
+            n_pos * (n_pos + 1) / 2) / (n_pos * n_neg)
+  expect_gte(auc, 0.80,
+             label = "Kitchen-sink AUC must be genuinely good (>= 0.80)")
+
+  coef_kitchen <- tidy(kitchen_sink) |>
+    filter(term == "has_exception") |> pull(estimate)
+  expect_lt(coef_kitchen, 0,
+            label = "Kitchen-sink coefficient must be WRONG-SIGNED (negative)")
+})
+
+# ==============================================================================
+# DAG: dagitty's minimal sufficient adjustment set
+# ==============================================================================
   adj <- get_adjustment_strategy(dag)
 
   adj_vars <- unlist(adj)

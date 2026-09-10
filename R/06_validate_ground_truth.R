@@ -1,6 +1,7 @@
 library(dplyr)
 library(broom)
 library(tibble)
+library(rsample)
 
 #' Get Ground Truth Causal Effect
 #'
@@ -9,12 +10,12 @@ library(tibble)
 #' Two estimands are reported:
 #'   - log_odds: the structural coefficient (+0.5) on the log-odds scale. NOTE:
 #'     logistic coefficients are NON-COLLAPSIBLE, so a correctly-specified causal
-#'     model estimates a slightly attenuated value (~0.43) when a strong latent
+#'     model estimates a slightly attenuated value (~0.34) when a strong latent
 #'     cause of the outcome (impatience) is unmeasured. The SIGN and the marginal
 #'     effect are what matter for decisions.
 #'   - ate_pp: the TRUE marginal Average Treatment Effect (risk difference),
 #'     computed via g-computation on the DGP. This is collapsible and is the
-#'     honest, business-facing headline number (~+6.8 percentage points).
+#'     honest, business-facing headline number (~+6.3 percentage points).
 #'
 #' @return A list with the true effect on different scales.
 get_ground_truth_ate <- function() {
@@ -31,7 +32,7 @@ get_ground_truth_ate <- function() {
   impatience   <- rnorm(n)
   spend_z      <- as.numeric(scale(round(rlnorm(n, 4, 0.5), 2)))
   lin <- function(exc) {
-    -1.0 + 0.5 * exc + (-2.0) * order_volume + 1.0 * impatience + (-0.3) * spend_z
+    -1.0 + 0.5 * exc + (-2.0) * order_volume + 1.5 * impatience + (-0.3) * spend_z
   }
   true_ate <- mean(inv_logit(lin(1)) - inv_logit(lin(0)))
 
@@ -120,13 +121,68 @@ compare_to_ground_truth <- function(data, naive_workflows, causal_workflows) {
   true_ate <- truth$ate_pp
 
   tibble(
-    Method = c("Ground Truth (DGP)", "Naive Model (Simpson + Collider)", "Causal Model (DAG-Guided)"),
+    Method = c("Ground Truth (DGP)", "Naive Model", "Causal Model (DAG-Guided)"),
     ATE_pp = c(true_ate, naive_ate, causal_ate),
     Bias_pp = c(0, naive_ate - true_ate, causal_ate - true_ate),
     Direction = c(
       "Positive (Increases Churn)",
       ifelse(naive_ate > 0, "Positive", "NEGATIVE (Decreases Churn) -- WRONG"),
       ifelse(causal_ate > 0, "Positive (Increases Churn)", "Negative")
+    )
+  )
+}
+
+#' Evaluate Predictive Performance Across Specifications
+#'
+#' Test-set AUC for the three headline specifications, all fitted on the SAME
+#' stratified 80/20 split (seed 123) so the numbers compare directly:
+#'   - Kitchen-Sink (naive): every observed feature -- KEEPS the collider
+#'   - Causal (DAG-guided): adds the confounder, DROPS the collider
+#'   - Aggregate: exception only (the Simpson's-paradox view of the data)
+#'
+#' The punchline these numbers support: the naive model is the BEST predictor
+#' of the three and still gives the wrong causal advice.
+#'
+#' @param data The simulated dataset
+#' @return A tibble with Specification and Test_AUC
+evaluate_predictive_performance <- function(data) {
+
+  data_numeric <- data |>
+    mutate(churn_numeric = as.numeric(as.character(churned)))
+
+  set.seed(123)
+  data_split <- initial_split(data_numeric, prop = 0.8, strata = churned)
+  train_data <- training(data_split)
+  test_data <- testing(data_split)
+
+  # Mann-Whitney AUC (equivalent to yardstick::roc_auc, dependency-light)
+  compute_auc <- function(truth, prob) {
+    n_pos <- sum(truth == 1)
+    n_neg <- sum(truth == 0)
+    ranks <- rank(prob)
+    (sum(ranks[truth == 1]) - n_pos * (n_pos + 1) / 2) / (n_pos * n_neg)
+  }
+
+  fit_auc <- function(formula) {
+    model <- glm(formula, data = train_data, family = binomial())
+    prob <- predict(model, newdata = test_data, type = "response")
+    compute_auc(test_data$churn_numeric, prob)
+  }
+
+  tibble(
+    Specification = c(
+      "Kitchen-Sink (keeps collider)",
+      "Causal (DAG-guided)",
+      "Aggregate (exception only)"
+    ),
+    Test_AUC = c(
+      fit_auc(
+        churn_numeric ~ has_exception + order_volume + monthly_spend_usd +
+          opened_support_ticket + customer_age_years +
+          marketing_emails_clicked + app_logins_last_7_days
+      ),
+      fit_auc(churn_numeric ~ has_exception + order_volume + monthly_spend_usd),
+      fit_auc(churn_numeric ~ has_exception)
     )
   )
 }
