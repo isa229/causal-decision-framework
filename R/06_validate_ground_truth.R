@@ -121,7 +121,7 @@ compare_to_ground_truth <- function(data, naive_workflows, causal_workflows) {
   true_ate <- truth$ate_pp
 
   tibble(
-    Method = c("Ground Truth (DGP)", "Naive Model (Kitchen-Sink / Collider)", "Causal Model (DAG-Guided)"),
+    Method = c("Ground Truth (DGP)", "Naive Model", "Causal Model (DAG-Guided)"),
     ATE_pp = c(true_ate, naive_ate, causal_ate),
     Bias_pp = c(0, naive_ate - true_ate, causal_ate - true_ate),
     Direction = c(
