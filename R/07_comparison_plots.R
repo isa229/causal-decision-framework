@@ -2,6 +2,12 @@ library(ggplot2)
 library(dplyr)
 library(patchwork)
 
+
+if (!identical(getOption("ix_talk_theme_loaded"), TRUE)) {
+  source(if (requireNamespace("here", quietly = TRUE))
+    here::here("R", "00_theme_talk.R") else "R/00_theme_talk.R")
+}
+
 #' Plot Ground Truth Comparison (Marginal ATE scale)
 #'
 #' Side-by-side comparison of the true ATE, the naive estimate (wrong sign), and
@@ -17,7 +23,7 @@ plot_ground_truth_comparison <- function(comparison_table) {
     mutate(
       Method = factor(Method, levels = c(
         "Ground Truth (DGP)",
-        "Naive Model (Kitchen-Sink / Collider)",
+        "Naive Model",
         "Causal Model (DAG-Guided)"
       )),
       Color = case_when(
@@ -29,36 +35,23 @@ plot_ground_truth_comparison <- function(comparison_table) {
     )
 
   ggplot(plot_data, aes(x = Method, y = ATE_pp, fill = Color)) +
-    geom_hline(yintercept = 0, linetype = "dashed", color = "gray40", linewidth = 0.5) +
-    geom_hline(yintercept = truth_val, linetype = "solid", color = "darkgreen",
+    geom_hline(yintercept = 0, linetype = "dashed", color = ix_faint, linewidth = 0.5) +
+    geom_hline(yintercept = truth_val, linetype = "solid", color = ix_green,
                linewidth = 0.8, alpha = 0.6) +
     geom_col(width = 0.6, alpha = 0.9) +
     geom_text(aes(label = Label, y = ATE_pp + sign(ATE_pp) * 1.5),
-              size = 4, fontface = "bold") +
+              colour = ix_white, family = ix_font, size = 5, fontface = "bold") +
     scale_fill_manual(
-      values = c("truth" = "#2E7D32", "wrong" = "#C62828", "correct" = "#1565C0"),
+      values = c("truth" = ix_green, "wrong" = ix_red, "correct" = ix_blue),
       guide = "none"
     ) +
     scale_x_discrete(labels = function(x) gsub(" ", "\n", x)) +
     labs(
-      title = "Validation Against Ground Truth: Causal Framework Recovers True Effect",
-      subtitle = paste(
-        "Naive kitchen-sink model (adjusts every confounder, KEEPS the collider) gets the WRONG SIGN.",
-        "DAG-guided model recovers the true marginal effect (green line).",
-        sep = "\n"
-      ),
+      title = "DAG-Guided Model Recovers the True Causal Effect",
       x = NULL,
-      y = "Effect of Delivery Exceptions on Churn (percentage points)",
-      caption = "Ground truth is the marginal ATE computed from the data generating process."
+      y = "Percentage Points"
     ) +
-    theme_minimal(base_size = 13) +
-    theme(
-      plot.title = element_text(face = "bold", size = 14),
-      plot.subtitle = element_text(size = 11, color = "gray30"),
-      axis.text.x = element_text(size = 10, face = "bold"),
-      panel.grid.major.x = element_blank(),
-      plot.caption = element_text(size = 9, color = "gray50", hjust = 0)
-    )
+    theme_talk()
 }
 
 #' Plot Coefficient Trajectories Across Model Specifications (Log-Odds)
@@ -112,30 +105,24 @@ plot_coefficient_trajectory <- function(data) {
     )
 
   ggplot(coefs, aes(x = Model, y = estimate, color = Color, group = 1)) +
-    geom_hline(yintercept = 0.5, linetype = "dashed", color = "darkgreen", linewidth = 0.8) +
-    geom_hline(yintercept = 0, linetype = "dotted", color = "gray50") +
-    geom_line(linewidth = 1.2, color = "gray40") +
+    geom_hline(yintercept = 0.5, linetype = "dashed", color = ix_green, linewidth = 0.8) +
+    geom_hline(yintercept = 0, linetype = "dotted", color = ix_faint) +
+    geom_line(linewidth = 1.2, color = ix_faint) +
     geom_point(size = 4) +
     geom_errorbar(aes(ymin = estimate - 1.96 * std.error,
                       ymax = estimate + 1.96 * std.error),
                   width = 0.2, linewidth = 1) +
     scale_color_manual(
-      values = c("correct" = "#1565C0", "wrong" = "#C62828"),
+      values = c("correct" = ix_blue, "wrong" = ix_red),
       guide = "none"
     ) +
     labs(
-      title = "Effect Estimate Across Model Specifications",
-      subtitle = "Only the DAG-guided model (add confounder, drop collider) recovers the truth.",
+      title = "Exception Effect Across Specifications",
       x = NULL,
-      y = "Effect of Exceptions on Churn (Log-Odds)",
-      caption = "Green dashed line = true structural coefficient (0.5). Error bars are 95% CIs."
+      y = "Log-Odds"
     ) +
-    theme_minimal(base_size = 13) +
-    theme(
-      plot.title = element_text(face = "bold"),
-      axis.text.x = element_text(angle = 15, hjust = 1, face = "bold"),
-      panel.grid.major.x = element_blank()
-    )
+    theme_talk() +
+    theme(axis.text.x = element_text(angle = 15, hjust = 1))
 }
 
 #' Plot Simpson's Paradox (Two-Line Decile Plot)
@@ -184,24 +171,13 @@ plot_simpsons_paradox <- function(data) {
     geom_line(linewidth = 1.2) +
     geom_point(aes(size = n), alpha = 0.85) +
     scale_x_continuous(breaks = 1:10) +
-    scale_color_manual(values = c("No Exception" = "#1565C0", "Delivery Exception" = "#C62828")) +
+    scale_color_manual(values = c("No Exception" = ix_blue, "Delivery Exception" = ix_red)) +
     scale_size_continuous(range = c(2, 8), guide = "none") +
     labs(
-      title = "Simpson's Paradox: Within Every Group, Exceptions Increase Churn",
-      subtitle = paste0(
-        "WITHIN each volume decile the red (exception) line is ABOVE blue -> exceptions raise churn.\n",
-        "But exception customers cluster in high-volume/low-churn deciles, so the AGGREGATE reverses (",
-        round(agg_diff, 1), " pp)."
-      ),
-      x = "Order Volume Decile (1 = lowest, 10 = highest)",
+      title = "Churn Rate by Order-Volume Decile",
+      x = "Order Volume Decile",
       y = "Churn Rate (%)",
-      color = NULL,
-      caption = "Point size = number of customers. Order volume is the confounder; adjusting for it reveals the truth."
+      color = NULL
     ) +
-    theme_minimal(base_size = 13) +
-    theme(
-      plot.title = element_text(face = "bold"),
-      legend.position = "top",
-      panel.grid.minor = element_blank()
-    )
+    theme_talk()
 }

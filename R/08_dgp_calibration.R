@@ -60,6 +60,8 @@
 
 library(here)
 
+source(here::here("R", "00_theme_talk.R"))  # talk visual identity (Lato, ix palette)
+
 # ------------------------------------------------------------------------------
 # 0. Fixed design constants (seeds mirror the pipeline conventions)
 # ------------------------------------------------------------------------------
@@ -531,51 +533,46 @@ panel_auc <- ggplot2::ggplot(
   dplyr::filter(scored_grid, impatience_effect == chosen_effect),
   ggplot2::aes(collider_strength, naive_test_auc)
 ) +
-  ggplot2::geom_line(color = "#1565C0", linewidth = 1) +
+  ggplot2::geom_line(color = ix_blue, linewidth = 1) +
   ggplot2::geom_point(ggplot2::aes(color = passes_all), size = 2.5) +
   ggplot2::geom_hline(
-    yintercept = 0.80, linetype = "dashed", color = "gray50"
+    yintercept = 0.80, linetype = "dashed", color = ix_faint
   ) +
   ggplot2::geom_vline(
-    xintercept = chosen_strength, linetype = "dotted", color = "gray40"
+    xintercept = chosen_strength, linetype = "dotted", color = ix_faint
   ) +
   ggplot2::scale_color_manual(
-    values = c("TRUE" = "#2E7D32", "FALSE" = "gray70"), guide = "none"
+    values = c("TRUE" = ix_green, "FALSE" = ix_faint), guide = "none"
   ) +
   ggplot2::labs(
-    title = "A Stronger Collider Buys Better Metrics",
-    subtitle = "Naive test AUC vs collider strength (dashed = 0.80 bar)",
+    title = "Naive AUC vs Collider Strength",
     x = "Collider strength", y = "Naive test AUC"
   ) +
-  ggplot2::theme_minimal(base_size = 12)
+  theme_talk(base_size = 14)
 
 panel_coef <- ggplot2::ggplot(
   dplyr::filter(scored_grid, impatience_effect == chosen_effect),
   ggplot2::aes(collider_strength, naive_coefficient)
 ) +
-  ggplot2::geom_hline(yintercept = 0, color = "gray40") +
-  ggplot2::geom_line(color = "#C62828", linewidth = 1) +
+  ggplot2::geom_hline(yintercept = 0, color = ix_faint) +
+  ggplot2::geom_line(color = ix_red, linewidth = 1) +
   ggplot2::geom_point(ggplot2::aes(color = passes_all), size = 2.5) +
   ggplot2::geom_vline(
-    xintercept = chosen_strength, linetype = "dotted", color = "gray40"
+    xintercept = chosen_strength, linetype = "dotted", color = ix_faint
   ) +
   ggplot2::scale_color_manual(
-    values = c("TRUE" = "#2E7D32", "FALSE" = "gray70"), guide = "none"
+    values = c("TRUE" = ix_green, "FALSE" = ix_faint), guide = "none"
   ) +
   ggplot2::labs(
-    title = "...and a More WRONG Causal Answer",
-    subtitle = paste0(
-      "Naive has_exception coefficient vs collider strength\n",
-      "(true effect = +0.5; below zero = wrong sign)"
-    ),
+    title = "Exception Coefficient vs Collider Strength",
     x = "Collider strength", y = "has_exception coefficient (log-odds)"
   ) +
-  ggplot2::theme_minimal(base_size = 12)
+  theme_talk(base_size = 14)
 
 ggplot2::ggsave(
   here::here("figures", "00_dgp_calibration.png"),
   patchwork::wrap_plots(panel_auc, panel_coef, ncol = 1),
-  width = 10, height = 7, dpi = 300, bg = "white"
+  width = 10, height = 7, dpi = 300, bg = ix_black
 )
 cat("Saved: figures/00_dgp_calibration.png\n\n")
 

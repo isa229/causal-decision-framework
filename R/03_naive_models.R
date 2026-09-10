@@ -5,6 +5,12 @@ library(purrr)
 library(vip)
 library(ggplot2)
 
+
+if (!identical(getOption("ix_talk_theme_loaded"), TRUE)) {
+  source(if (requireNamespace("here", quietly = TRUE))
+    here::here("R", "00_theme_talk.R") else "R/00_theme_talk.R")
+}
+
 #' Train Multiple Naive Predictive Models (The Trap)
 #'
 #' Trains GLM, Random Forest, and XGBoost models the way a competent
@@ -72,21 +78,17 @@ plot_glm_trap <- function(fitted_workflows) {
     extract_fit_parsnip()
 
   tidy(glm_fit) |>
-    filter(term != "(Intercept)") |>
+    filter(!term %in% c("(Intercept)", "order_volume")) |>
     mutate(
       term = reorder(term, estimate),
       is_negative = estimate < 0
     ) |>
     ggplot(aes(x = estimate, y = term, fill = is_negative)) +
     geom_col() +
-    scale_fill_manual(values = c("TRUE" = "firebrick", "FALSE" = "steelblue")) +
-    theme_minimal() +
-    labs(
-      title = "Naive Logistic Regression Coefficients",
-      subtitle = "'has_exception' is NEGATIVE. The model claims delays REDUCE churn.",
-      x = "Log-Odds Estimate",
-      y = NULL
-    ) +
+    scale_fill_manual(values = c("TRUE" = ix_red, "FALSE" = ix_blue)) +
+    labs(title = "Naive Model Coefficients",
+         x = "Log-Odds Estimate", y = NULL) +
+    theme_talk() +
     theme(legend.position = "none")
 }
 
@@ -101,12 +103,7 @@ plot_xgb_vip <- function(fitted_workflows) {
     _[[1]] |>
     extract_fit_parsnip()
 
-  vip(xgb_fit, geom = "col", aesthetics = list(fill = "firebrick")) +
-    theme_minimal() +
-    labs(
-      title = "Naive XGBoost Feature Importance",
-      subtitle = "XGBoost leans heavily on the Collider (support_ticket) - its top predictor.",
-      x = "Features",
-      y = "Importance"
-    )
+  vip(xgb_fit, geom = "col", aesthetics = list(fill = ix_orange)) +
+    labs(title = "Naive Model Feature Importance") +
+    theme_talk()
 }

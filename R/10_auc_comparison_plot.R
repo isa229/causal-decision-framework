@@ -13,6 +13,11 @@
 library(ggplot2)
 library(dplyr)
 
+if (!identical(getOption("ix_talk_theme_loaded"), TRUE)) {
+  source(if (requireNamespace("here", quietly = TRUE))
+    here::here("R", "00_theme_talk.R") else "R/00_theme_talk.R")
+}
+
 source("R/02_simulate_data.R")
 source("R/06_validate_ground_truth.R")
 
@@ -49,40 +54,24 @@ plot_data <- auc_table |>
   )
 
 p <- ggplot(plot_data, aes(x = Specification, y = Test_AUC, fill = Color)) +
-  geom_hline(yintercept = 0.5, linetype = "dotted", color = "gray50") +
+  geom_hline(yintercept = 0.5, linetype = "dotted", color = ix_faint) +
   geom_col(width = 0.6, alpha = 0.9) +
   geom_text(aes(label = Label, y = Test_AUC + 0.015), size = 5,
-            fontface = "bold") +
+            fontface = "bold", colour = ix_white, family = ix_font) +
   scale_fill_manual(
     values = c(
-      "correct" = "#1565C0", "wrong" = "#C62828", "neutral" = "gray60"
+      "correct" = ix_blue, "wrong" = ix_red, "neutral" = ix_purple
     ),
     guide = "none"
   ) +
   scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.2)) +
   labs(
     title = "The Best Predictor Gives the Worst Advice",
-    subtitle = paste(
-      "Test-set AUC by specification. The naive kitchen-sink model (keeps the",
-      "collider) is the best predictor -- and the only one whose causal",
-      "estimate has the wrong sign."
-    ),
     x = NULL,
-    y = "Test AUC (held-out 20%)",
-    caption = paste(
-      "Same stratified 80/20 split (seed 123) for all three specifications.",
-      "Dotted line = chance (AUC 0.5)."
-    )
+    y = "Test AUC"
   ) +
-  theme_minimal(base_size = 13) +
-  theme(
-    plot.title = element_text(face = "bold", size = 14),
-    plot.subtitle = element_text(size = 11, color = "gray30"),
-    axis.text.x = element_text(size = 10, face = "bold"),
-    panel.grid.major.x = element_blank(),
-    plot.caption = element_text(size = 9, color = "gray50", hjust = 0)
-  )
+  theme_talk()
 
 ggsave("figures/09_auc_comparison.png", p,
-       width = 10, height = 6, dpi = 300, bg = "white")
+       width = 10, height = 6, dpi = 300, bg = ix_black)
 cat("Saved: figures/09_auc_comparison.png\n")

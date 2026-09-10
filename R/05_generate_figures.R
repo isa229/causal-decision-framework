@@ -1,6 +1,7 @@
 # Load required libraries
 library(ggplot2)
 library(here)
+source(here::here("R", "00_theme_talk.R"))
 source(here::here("R", "01_define_dag.R"))
 source(here::here("R", "02_simulate_data.R"))
 source(here::here("R", "03_naive_models.R"))
@@ -28,7 +29,7 @@ cat("  dagitty minimal sufficient adjustment set: { ",
     paste(unlist(adj), collapse = ", "), " }\n", sep = "")
 
 ggsave(here::here("figures", "01_causal_dag.png"),
-       dag_results$plot, width = 9, height = 6, dpi = 300, bg = "white")
+       dag_results$plot, width = 9, height = 6, dpi = 300, bg = ix_black)
 
 # ------------------------------------------------------------------------------
 # 3. The in silico laboratory
@@ -41,7 +42,7 @@ df <- simulate_delivery_data(n_customers = 50000, seed = 2026)
 # ------------------------------------------------------------------------------
 cat("Step 3/8: Building the Simpson's Paradox figure...\n")
 ggsave(here::here("figures", "02_simpsons_paradox.png"),
-       plot_simpsons_paradox(df), width = 10, height = 6, dpi = 300, bg = "white")
+       plot_simpsons_paradox(df), width = 10, height = 6, dpi = 300, bg = ix_black)
 
 # ------------------------------------------------------------------------------
 # 5. Naive models (the trap)
@@ -49,9 +50,9 @@ ggsave(here::here("figures", "02_simpsons_paradox.png"),
 cat("Step 4/8: Fitting naive kitchen-sink models (every feature; keeps the collider)...\n")
 naive_models <- fit_naive_models(df)
 ggsave(here::here("figures", "03_naive_glm_trap.png"),
-       plot_glm_trap(naive_models), width = 8, height = 6, dpi = 300, bg = "white")
+       plot_glm_trap(naive_models), width = 8, height = 6, dpi = 300, bg = ix_black)
 ggsave(here::here("figures", "04_naive_xgb_vip.png"),
-       plot_xgb_vip(naive_models), width = 8, height = 6, dpi = 300, bg = "white")
+       plot_xgb_vip(naive_models), width = 8, height = 6, dpi = 300, bg = ix_black)
 
 # ------------------------------------------------------------------------------
 # 6. Causal models (the solution)
@@ -59,9 +60,9 @@ ggsave(here::here("figures", "04_naive_xgb_vip.png"),
 cat("Step 5/8: Fitting causal models (DAG-guided adjustment)...\n")
 causal_models <- fit_causal_models(df)
 ggsave(here::here("figures", "05_causal_glm_solution.png"),
-       plot_causal_glm(causal_models), width = 8, height = 6, dpi = 300, bg = "white")
+       plot_causal_glm(causal_models), width = 8, height = 6, dpi = 300, bg = ix_black)
 ggsave(here::here("figures", "06_causal_xgb_vip.png"),
-       plot_causal_xgb(causal_models), width = 8, height = 6, dpi = 300, bg = "white")
+       plot_causal_xgb(causal_models), width = 8, height = 6, dpi = 300, bg = ix_black)
 
 # ------------------------------------------------------------------------------
 # 7. Validation against ground truth (marginal ATE, percentage points)
@@ -74,10 +75,10 @@ print(comparison, n = Inf)
 cat(strrep("-", 80), "\n\n")
 
 ggsave(here::here("figures", "07_ground_truth_comparison.png"),
-       plot_ground_truth_comparison(comparison), width = 10, height = 7, dpi = 300, bg = "white")
+       plot_ground_truth_comparison(comparison), width = 10, height = 7, dpi = 300, bg = ix_black)
 
 ggsave(here::here("figures", "08_coefficient_trajectory.png"),
-       plot_coefficient_trajectory(df), width = 10, height = 6, dpi = 300, bg = "white")
+       plot_coefficient_trajectory(df), width = 10, height = 6, dpi = 300, bg = ix_black)
 
 # ------------------------------------------------------------------------------
 # 8. Bootstrap CI for the causal ATE

@@ -4,6 +4,11 @@ library(ggplot2)
 library(dplyr)
 library(broom)
 
+if (!identical(getOption("ix_talk_theme_loaded"), TRUE)) {
+  source(if (requireNamespace("here", quietly = TRUE))
+    here::here("R", "00_theme_talk.R") else "R/00_theme_talk.R")
+}
+
 #' Define and Plot the Causal DAG
 #'
 #' Formalizes the business assumptions about the Data Generating Process.
@@ -37,15 +42,22 @@ define_causal_dag <- function() {
     "Spend" -> "Churn"
   }')
 
-  p <- ggdag(delivery_dag, node = FALSE, text_col = "black", text_size = 3.6) +
+  # Dark-slide render: white Lato node labels on the #1B1B1B canvas, faint
+  # edges. Built from tidy_dagitty() directly so every color and font is under
+  # our control (the pre-baked ggdag() defaults assume a white background).
+  td <- tidy_dagitty(delivery_dag)
+
+  p <- ggplot(td, aes(x = x, y = y, xend = xend, yend = yend)) +
+    geom_dag_edges(edge_colour = ix_faint) +
+    geom_dag_text(aes(label = name), colour = ix_white,
+                  family = ix_font, size = 3.8) +
     theme_dag_blank() +
-    labs(
-      title = "Causal DAG: Two Traps in One Business Question",
-      subtitle = paste(
-        "Order_Volume is a CONFOUNDER (must ADD it) -> Simpson's Paradox.",
-        "Support_Ticket is a COLLIDER (must REMOVE it) -> spurious correlation.",
-        sep = "\n"
-      )
+    labs(title = "Causal DAG") +
+    theme(
+      plot.background = element_rect(fill = ix_black, colour = ix_black),
+      plot.title = element_text(family = ix_font_title, colour = ix_white,
+                                size = 22, hjust = 0.5,
+                                margin = margin(b = 10, t = 6))
     )
 
   list(dag = delivery_dag, plot = p)
