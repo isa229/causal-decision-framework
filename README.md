@@ -31,6 +31,8 @@ The simulated scenario — *do delivery exceptions cause churn?* — embeds **tw
 
 > **A note:** logistic-regression coefficients are **non-collapsible**, so when a strong latent cause of churn is unmeasured the correctly-specified model returns a slightly *attenuated* log-odds coefficient. We therefore headline the **marginal Average Treatment Effect (ATE)** on the probability (risk-difference) scale, recovered by **g-computation**. The ATE is collapsible, decision-relevant, and recovers the truth.
 
+📖 **The full walkthrough lives in `docs/causal-framework-explained.qmd`**: a live-computed deep dive where every number is rendered from the code itself. It covers how the in-silico laboratory was calibrated so the collider beats the true effect, the two model recipes side by side, how the estimate moves across specifications, the uncertainty and robustness checks (bootstrap CI and E-value), a field guide for what to do with each type of variable, and whether we pay for the fix in predictive accuracy. A pre-rendered copy is at `docs/causal-framework-explained.html`: just open it in a browser, no Quarto needed.
+
 ---
 
 ## 🚀 Quick Start
@@ -74,6 +76,14 @@ Rscript R/11_causal_roc_plot.R      # DAG-guided-model ROC curves
 Rscript R/12_berksons_paradox_plot.R # Berkson's paradox figure (uses the latent impatience)
 ```
 
+**Optional: render the full walkthrough yourself** (requires Quarto):
+
+```bash
+quarto render docs/causal-framework-explained.qmd
+```
+
+Or skip Quarto entirely and open the pre-rendered `docs/causal-framework-explained.html` in your browser.
+
 ## 📁 Repository Structure
 
 ```
@@ -95,7 +105,8 @@ causal-decision-framework/
 │   └── testthat/
 │       └── test_simulation.R      # Validates the headline contract + both traps
 ├── docs/
-│   └── causal-framework-explained.qmd  # Live-computed wiki deep-dive
+│   ├── causal-framework-explained.qmd  # Live-computed deep dive (source; render with Quarto)
+│   └── causal-framework-explained.html # Pre-rendered copy; open in any browser
 ├── figures/                       # Generated plots
 ├── rv/                            # Dependency management
 ├── SLIDE_CONTEXT.md               # Tiered briefing pack for building the talk
