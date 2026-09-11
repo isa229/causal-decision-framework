@@ -37,8 +37,8 @@ The simulated scenario — *do delivery exceptions cause churn?* — embeds **tw
 
 ### Prerequisites
 - R 4.5+
-- Positron or RStudio
-- `rv` for dependency management (included in repo)
+- Any IDE, but Positron or RStudio recommended :)
+- `rv` for dependency management
 
 ### Run the Complete Analysis
 
@@ -114,7 +114,7 @@ The suite asserts, among other things, that:
 
 ## A Note on AI Assistance
 
-For transparency: this repository was built with the assistance of an AI coding agent, used as an **assistant and pair-programmer**. The **main idea, the causal narrative, and the architecture of the workflow are entirely the author's**. The AI contributed in two concrete ways: drafting code (always reviewed, validated, and tested by the author before being committed) and expanding the documentation for the repository and of each function, with the goal of making the repository more **pedagogical** as a learning resource.
+For transparency: this repository was built with the assistance of an AI coding agent, used as an **assistant and pair-programmer**. The **main idea, the causal narrative, the methodology, and the architecture of the workflow are entirely the author's**. The AI contributed in two concrete ways: drafting code (always reviewed, validated, and tested by the author before being committed) and expanding the documentation for the repository and of each function, with the goal of making the repository more **pedagogical** as a learning resource.
 
 ---
 
@@ -127,9 +127,10 @@ For transparency: this repository was built with the assistance of an AI coding 
 ##  References & Further Reading
 
 ### Causal Inference Foundations
+- Pearl, J. & Mackenzie, D. (2018). *The Book of Why*
+- *Causal Inference in R* — Malcolm Barrett, Lucy D'Agostino McGowan & Travis Gerke (2026): free online book, [r-causal.org](https://www.r-causal.org/)
 - Pearl, J. (2009). *Causality: Models, Reasoning, and Inference*
 - Hernán, M.A. & Robins, J.M. (2020). *Causal Inference: What If*
-- Pearl, J. & Mackenzie, D. (2018). *The Book of Why*
 
 ### Methods Used Here
 - VanderWeele, T.J. & Ding, P. (2017). "Sensitivity Analysis in Observational Research: Introducing the E-Value." *Annals of Internal Medicine.*
