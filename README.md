@@ -1,4 +1,4 @@
-# Beyond Prediction: A Causal Workflow using R for solving real world problems
+# Beyond Prediction: A Causal Framework using R for solving real world problems
 
 [![PositConf 2026](https://img.shields.io/badge/PositConf-2026-blue)](https://posit.co/conference/)
 [![R](https://img.shields.io/badge/R-4.5-blue)](https://www.r-project.org/)
@@ -153,7 +153,7 @@ For transparency: this repository was built with the assistance of an AI coding 
 
 ## Presented At
 
-**PositConf 2026** — "Beyond Prediction: A Causal Workflow in R for Real-World Problems" (Virtual Session: Modelling, 20 min)
+**PositConf 2026** — "Beyond Prediction: A Causal Framework using R for solving real world problems" (Virtual Session: Modelling, 20 min)
 
 ---
 
