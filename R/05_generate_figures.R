@@ -38,7 +38,7 @@ cat("Step 2/8: Simulating 50,000 customers (true effect baked in)...\n")
 df <- simulate_delivery_data(n_customers = 50000, seed = 2026)
 
 # ------------------------------------------------------------------------------
-# 4. The Simpson's Paradox figure (the signature visual)
+# 4. The Simpson's Paradox figure
 # ------------------------------------------------------------------------------
 cat("Step 3/8: Building the Simpson's Paradox figure...\n")
 ggsave(here::here("figures", "02_simpsons_paradox.png"),
@@ -89,7 +89,7 @@ print(boot_ci)
 cat("\n")
 
 # ------------------------------------------------------------------------------
-# 9. E-value sensitivity analysis (backup slide)
+# 9. E-value sensitivity analysis
 # ------------------------------------------------------------------------------
 cat("Step 8/8: E-value sensitivity analysis (robustness to latent impatience)...\n")
 # Fit the DAG-guided specification on the RAW scale: the tidymodels workflow
