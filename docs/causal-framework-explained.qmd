@@ -470,13 +470,21 @@ and only the second is safe to act on.
 # 1. Activate the environment (exact package versions via rv)
 source("rv/scripts/activate.R")
 
-# 2. Regenerate every figure and the validation output
+# 2. Regenerate the core figures (01-08) plus the validation output
+#    (ground-truth comparison, bootstrap CI, E-value)
 source("R/05_generate_figures.R")
 
-# 3. Run the test suite (asserts both traps emerge and the causal model wins)
+# 3. Optional: regenerate these extra figures. These four scripts are
+#    standalone and deterministic, you can run them from the terminal, in any order:
+#    Rscript R/09_naive_roc_plots.R        # naive model ROC curves
+#    Rscript R/10_auc_comparison_plot.R    # AUC trade-off comparison
+#    Rscript R/11_causal_roc_plot.R        # DAG-guided model ROC curves
+#    Rscript R/12_berksons_paradox_plot.R  # Berkson's paradox (latent impatience)
+
+# 4. Run the test suite (asserts both traps emerge and the causal model wins)
 testthat::test_dir("tests/testthat")
 
-# 4. Re-render this document
+# 5. Re-render this document
 quarto::quarto_render("docs/causal-framework-explained.qmd")
 ```
 
