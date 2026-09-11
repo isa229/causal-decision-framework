@@ -42,17 +42,37 @@ The simulated scenario — *do delivery exceptions cause churn?* — embeds **tw
 
 ### Run the Complete Analysis
 
-```r
+**Step 1 Terminal: sync dependencies** (installs the locked R 4.5 package set
+from `rproject.toml` into `rv/library/`. Run once, or after changing dependencies):
+
+```bash
 rv sync
+```
+
+**Step 2 R console: run the core analysis** (simulation, both model families,
+ground-truth validation, and the main figures):
+
+```r
 source("R/05_generate_figures.R")
 ```
 
 This will:
-- Create the publication-quality figures in `figures/`
+- Create the core figures in `figures/` (DAG, Simpson's paradox, ROC curves, coefficient and effect comparisons)
 - Validate estimates against ground truth (marginal ATE, percentage points)
 - Print the comparison table with bias quantification
 - Generate a bootstrap 95% confidence interval
 - Compute an E-value sensitivity analysis for unmeasured confounding
+
+**Optional — talk figures.** Four newer standalone scripts produce the
+remaining slide figures. They are deterministic (fixed seeds), source their own
+dependencies, and can be run in any order from the repo root:
+
+```bash
+Rscript R/09_naive_roc_plots.R      # Naive-model ROC curves (great metrics)
+Rscript R/10_auc_comparison_plot.R  # AUC trade-off: naive vs DAG-guided
+Rscript R/11_causal_roc_plot.R      # DAG-guided-model ROC curves
+Rscript R/12_berksons_paradox_plot.R # Berkson's paradox figure (uses the latent impatience)
+```
 
 ## 📁 Repository Structure
 
@@ -68,7 +88,9 @@ causal-decision-framework/
 │   ├── 08_dgp_calibration.R       # In-silico lab design (collider calibration)
 │   ├── 09_naive_roc_plots.R       # Naive-model ROC figures (metrics look great)
 │   ├── 10_auc_comparison_plot.R   # AUC trade-off figure (naive vs causal)
-│   └── 05_generate_figures.R      # Main execution script
+│   ├── 11_causal_roc_plot.R       # DAG-guided-model ROC figures
+│   ├── 12_berksons_paradox_plot.R # Berkson's paradox figure (latent impatience)
+│   └── 05_generate_figures.R      # Main execution script (core analysis)
 ├── tests/
 │   └── testthat/
 │       └── test_simulation.R      # Validates the headline contract + both traps
