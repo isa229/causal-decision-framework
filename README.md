@@ -65,9 +65,7 @@ This will:
 - Generate a bootstrap 95% confidence interval
 - Compute an E-value sensitivity analysis for unmeasured confounding
 
-**Optional — talk figures.** Four newer standalone scripts produce the
-remaining slide figures. They are deterministic (fixed seeds), source their own
-dependencies, and can be run in any order from the repo root:
+**Other figures.**
 
 ```bash
 Rscript R/09_naive_roc_plots.R      # Naive-model ROC curves (great metrics)
@@ -81,8 +79,6 @@ Rscript R/12_berksons_paradox_plot.R # Berkson's paradox figure (uses the latent
 ```bash
 quarto render docs/causal-framework-explained.qmd
 ```
-
-Or skip Quarto entirely and open the pre-rendered `docs/causal-framework-explained.html` in your browser.
 
 ## 📁 Repository Structure
 
@@ -109,7 +105,6 @@ causal-decision-framework/
 │   └── causal-framework-explained.html # Pre-rendered copy; open in any browser
 ├── figures/                       # Generated plots
 ├── rv/                            # Dependency management
-├── SLIDE_CONTEXT.md               # Tiered briefing pack for building the talk
 └── README.md                      # This file
 ```
 
