@@ -7,7 +7,7 @@
 #   The talk's headline is a CONTRACT between the narrative and the data
 #   generating process (DGP) in R/02_simulate_data.R:
 #
-#     "The naive model -- every observed feature thrown in -- has genuinely
+#     "The naive model (every observed feature thrown in) has genuinely
 #      good metrics (test AUC ~ 0.84) yet estimates the effect of delivery
 #      exceptions on churn with the WRONG (negative) sign, because it
 #      conditions on the collider (opened_support_ticket). Dropping the
@@ -48,14 +48,14 @@
 #                        rate stays at a realistic ~25%. The knob is the
 #                        collider's STRENGTH, never its prevalence.
 #
-# SELECTION RULE: among passing cells pick the smallest collider_strength,
-#   then the smallest impatience_effect -- the WEAKEST collider that still
+# SELECTION RULE: among passing cells, we pick the smallest collider_strength,
+#   then the smallest impatience_effect, the WEAKEST collider that still
 #   breaks the headline, so the demo never relies on an absurd feature.
 #
 # OUTPUT
 #   - Console: grid report, chosen design, production-scale verification,
 #     and a MATCH/DRIFT check against R/02's actual constants.
-#   - figures/00_dgp_calibration.png: the design trade-off made visible --
+#   - figures/00_dgp_calibration.png: the design trade-off made visible:
 #     a stronger collider buys AUC and deepens the wrong sign at once.
 
 library(here)
@@ -130,7 +130,7 @@ simulate_core <- function(n_customers, seed, collider_strength,
     n_customers, 1, ticket_prob(ticket_intercept)
   )
 
-  # The true effect of exceptions is +0.5 log-odds -- fixed, never a knob.
+  # The true effect of exceptions is +0.5 log-odds (he fix it here, it's never a "knob").
   churn_linear <- function(exception) {
     -1.0 + 0.5 * exception - 2.0 * order_volume +
       impatience_effect * impatience - 0.3 * spend_scaled
@@ -220,7 +220,7 @@ compute_gcomp_ate_pp <- function(model, customers) {
   )
 }
 
-#' Fit One Logistic Specification and Summarise It
+#' Fit One Logistic Specification and summarise it
 #'
 #' @param formula A model formula that includes has_exception.
 #' @param train Training tibble.
@@ -362,8 +362,6 @@ apply_contract <- function(grid) {
 check_design_drift <- function(collider_strength, impatience_effect,
                                ticket_intercept) {
   source_lines <- readLines(here::here("R", "02_simulate_data.R"))
-  # Only CODE lines: docstring comments also mention "* impatience" and
-  # would be picked up ahead of the real equation.
   code_lines <- source_lines[!grepl("^\\s*#", source_lines)]
   ticket_line <- code_lines[grepl("log_odds_ticket <-", code_lines)]
   churn_lines <- code_lines[grepl("\\* impatience", code_lines)]
@@ -527,7 +525,7 @@ cat(sprintf(
 ))
 
 # ------------------------------------------------------------------------------
-# 3. Design figure: the trade-off the talk leans on
+# 3. Design figure: the trade-off
 # ------------------------------------------------------------------------------
 panel_auc <- ggplot2::ggplot(
   dplyr::filter(scored_grid, impatience_effect == chosen_effect),

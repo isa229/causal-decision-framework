@@ -39,14 +39,16 @@ vignettes/*.pdf
 # R Environment Variables
 .Renviron
 
-# pkgdown site
-docs/
+# pkgdown site (rendered output only; keep source docs like .qmd/.md tracked)
+docs/pkgdown/
+# Quarto/knitr rendered artifacts
+docs/*.html
+docs/*_files/
+/.quarto/
+
 
 # translation temp files
 po/*~
 
 # RStudio Connect folder
 rsconnect/
-
-#figures
-*.png

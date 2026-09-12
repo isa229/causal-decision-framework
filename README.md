@@ -1,4 +1,4 @@
-# Beyond Prediction: A Causal Workflow using R for solving real world problems
+# Beyond Prediction: A Causal Framework using R for solving real world problems
 
 [![PositConf 2026](https://img.shields.io/badge/PositConf-2026-blue)](https://posit.co/conference/)
 [![R](https://img.shields.io/badge/R-4.5-blue)](https://www.r-project.org/)
@@ -31,28 +31,58 @@ The simulated scenario — *do delivery exceptions cause churn?* — embeds **tw
 
 > **A note:** logistic-regression coefficients are **non-collapsible**, so when a strong latent cause of churn is unmeasured the correctly-specified model returns a slightly *attenuated* log-odds coefficient. We therefore headline the **marginal Average Treatment Effect (ATE)** on the probability (risk-difference) scale, recovered by **g-computation**. The ATE is collapsible, decision-relevant, and recovers the truth.
 
+📖 **The full walkthrough lives in `docs/causal-framework-explained.qmd`**: a live-computed deep dive where every number is rendered from the code itself. It covers how the in-silico laboratory was calibrated so the collider beats the true effect, the two model recipes side by side, how the estimate moves across specifications, the uncertainty and robustness checks (bootstrap CI and E-value), a field guide for what to do with each type of variable, and whether we pay for the fix in predictive accuracy. A pre-rendered copy is at `docs/causal-framework-explained.html`: just open it in a browser, no Quarto needed.
+
 ---
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 - R 4.5+
-- Positron or RStudio
-- `rv` for dependency management (included in repo)
+- Any IDE, but Positron or RStudio recommended :)
+- `rv` for dependency management
 
 ### Run the Complete Analysis
 
-```r
+**Step 1 Terminal: sync dependencies** (installs the locked R 4.5 package set
+from `rproject.toml` into `rv/library/`. Run once, or after changing dependencies):
+
+```bash
 rv sync
+```
+
+**Step 2 R console: run the core analysis** (simulation, both model families,
+ground-truth validation, and the main figures):
+
+```r
 source("R/05_generate_figures.R")
 ```
 
 This will:
-- Create the publication-quality figures in `figures/`
+- Create the core figures in `figures/` (DAG, Simpson's paradox, ROC curves, coefficient and effect comparisons)
 - Validate estimates against ground truth (marginal ATE, percentage points)
 - Print the comparison table with bias quantification
 - Generate a bootstrap 95% confidence interval
 - Compute an E-value sensitivity analysis for unmeasured confounding
+
+**Optional — talk figures.** Four newer standalone scripts produce the
+remaining slide figures. They are deterministic (fixed seeds), source their own
+dependencies, and can be run in any order from the repo root:
+
+```bash
+Rscript R/09_naive_roc_plots.R      # Naive-model ROC curves (great metrics)
+Rscript R/10_auc_comparison_plot.R  # AUC trade-off: naive vs DAG-guided
+Rscript R/11_causal_roc_plot.R      # DAG-guided-model ROC curves
+Rscript R/12_berksons_paradox_plot.R # Berkson's paradox figure (uses the latent impatience)
+```
+
+**Optional: render the full walkthrough yourself** (requires Quarto):
+
+```bash
+quarto render docs/causal-framework-explained.qmd
+```
+
+Or skip Quarto entirely and open the pre-rendered `docs/causal-framework-explained.html` in your browser.
 
 ## 📁 Repository Structure
 
@@ -68,12 +98,15 @@ causal-decision-framework/
 │   ├── 08_dgp_calibration.R       # In-silico lab design (collider calibration)
 │   ├── 09_naive_roc_plots.R       # Naive-model ROC figures (metrics look great)
 │   ├── 10_auc_comparison_plot.R   # AUC trade-off figure (naive vs causal)
-│   └── 05_generate_figures.R      # Main execution script
+│   ├── 11_causal_roc_plot.R       # DAG-guided-model ROC figures
+│   ├── 12_berksons_paradox_plot.R # Berkson's paradox figure (latent impatience)
+│   └── 05_generate_figures.R      # Main execution script (core analysis)
 ├── tests/
 │   └── testthat/
 │       └── test_simulation.R      # Validates the headline contract + both traps
 ├── docs/
-│   └── causal-framework-explained.qmd  # Live-computed wiki deep-dive
+│   ├── causal-framework-explained.qmd  # Live-computed deep dive (source; render with Quarto)
+│   └── causal-framework-explained.html # Pre-rendered copy; open in any browser
 ├── figures/                       # Generated plots
 ├── rv/                            # Dependency management
 ├── SLIDE_CONTEXT.md               # Tiered briefing pack for building the talk
@@ -114,22 +147,23 @@ The suite asserts, among other things, that:
 
 ## A Note on AI Assistance
 
-For transparency: this repository was built with the assistance of an AI coding agent, used as an **assistant and pair-programmer**. The **main idea, the causal narrative, and the architecture of the workflow are entirely the author's**. The AI contributed in two concrete ways: drafting code (always reviewed, validated, and tested by the author before being committed) and expanding the documentation for the repository and of each function, with the goal of making the repository more **pedagogical** as a learning resource.
+For transparency: this repository was built with the assistance of an AI coding agent, used as an **assistant and pair-programmer**. The **main idea, the causal narrative, the methodology, and the architecture of the workflow are entirely the author's**. The AI contributed in two concrete ways: drafting code (always reviewed, validated, and tested by the author before being committed) and expanding the documentation for the repository and of each function, with the goal of making the repository more **pedagogical** as a learning resource.
 
 ---
 
 ## Presented At
 
-**PositConf 2026** — "Beyond Prediction: A Causal Workflow in R for Real-World Problems" (Virtual Session: Modelling, 20 min)
+**PositConf 2026** — "Beyond Prediction: A Causal Framework using R for solving real world problems" (Virtual Session: Modelling, 20 min)
 
 ---
 
 ##  References & Further Reading
 
 ### Causal Inference Foundations
+- Pearl, J. & Mackenzie, D. (2018). *The Book of Why*
+- *Causal Inference in R* — Malcolm Barrett, Lucy D'Agostino McGowan & Travis Gerke (2026): free online book, [r-causal.org](https://www.r-causal.org/)
 - Pearl, J. (2009). *Causality: Models, Reasoning, and Inference*
 - Hernán, M.A. & Robins, J.M. (2020). *Causal Inference: What If*
-- Pearl, J. & Mackenzie, D. (2018). *The Book of Why*
 
 ### Methods Used Here
 - VanderWeele, T.J. & Ding, P. (2017). "Sensitivity Analysis in Observational Research: Introducing the E-Value." *Annals of Internal Medicine.*
